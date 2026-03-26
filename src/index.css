@@ -1,0 +1,148 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+@layer base {
+  html {
+    background: #eef4ff;
+  }
+
+  body {
+    @apply font-sans text-gray-900 antialiased;
+    min-height: 100vh;
+    background: transparent;
+    overflow-x: hidden;
+  }
+
+  #root {
+    min-height: 100vh;
+    isolation: isolate;
+    overflow-x: hidden;
+  }
+}
+
+@layer utilities {
+  .site-shell {
+    @apply relative min-h-screen overflow-x-hidden;
+  }
+
+  .ambient-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.45) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.45) 1px, transparent 1px);
+    background-size: 72px 72px;
+  }
+
+  .dashboard-canvas {
+    background:
+      radial-gradient(circle at top left, rgba(14, 165, 233, 0.2), transparent 30%),
+      radial-gradient(circle at top right, rgba(249, 115, 22, 0.16), transparent 28%),
+      radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.16), transparent 26%),
+      linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(239,246,255,0.78) 45%, rgba(255,247,237,0.82) 100%);
+  }
+
+  .ambient-surface {
+    @apply bg-white/72 backdrop-blur-xl border border-white/60;
+    box-shadow: 0 20px 60px -32px rgba(15, 23, 42, 0.35);
+  }
+
+  .ambient-surface-strong {
+    @apply bg-white/82 backdrop-blur-2xl border border-white/70;
+    box-shadow: 0 24px 70px -34px rgba(15, 23, 42, 0.35);
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded transition-colors w-full sm:w-auto text-center;
+  }
+
+  .btn-orbit {
+    @apply inline-flex items-center justify-center rounded-2xl px-5 py-3 font-bold text-white transition-all duration-300;
+    background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #0ea5e9 100%);
+    box-shadow: 0 18px 32px -18px rgba(29, 78, 216, 0.8);
+  }
+
+  .btn-orbit:hover {
+    transform: translateY(-1px) scale(1.01);
+    box-shadow: 0 24px 38px -18px rgba(14, 165, 233, 0.65);
+  }
+
+  .btn-orbit-secondary {
+    @apply inline-flex items-center justify-center rounded-2xl px-5 py-3 font-bold transition-all duration-300;
+    background: rgba(255, 255, 255, 0.82);
+    color: #0f172a;
+    border: 1px solid rgba(148, 163, 184, 0.32);
+    box-shadow: 0 16px 28px -22px rgba(15, 23, 42, 0.55);
+  }
+
+  .btn-orbit-secondary:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  .dashboard-panel {
+    @apply rounded-[2rem] border border-white/70 bg-white/82 backdrop-blur-xl;
+    box-shadow: 0 28px 70px -40px rgba(15, 23, 42, 0.45);
+  }
+
+  .dashboard-stat {
+    @apply rounded-[2rem] border border-white/70 bg-white/82 p-6 backdrop-blur-xl;
+    background-image:
+      linear-gradient(140deg, rgba(255,255,255,0.98), rgba(239,246,255,0.82)),
+      radial-gradient(circle at top right, rgba(125, 211, 252, 0.24), transparent 35%);
+    box-shadow: 0 28px 70px -40px rgba(15, 23, 42, 0.45);
+  }
+
+  .dashboard-action-box {
+    @apply rounded-[1.75rem] border border-white/80 bg-white/88 p-4 backdrop-blur-xl;
+    box-shadow: 0 22px 46px -34px rgba(15, 23, 42, 0.5);
+  }
+
+  .dashboard-field {
+    @apply w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-gray-900 shadow-sm outline-none transition;
+  }
+
+  .dashboard-field:focus {
+    border-color: rgba(14, 165, 233, 0.7);
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
+  }
+
+  .dashboard-label {
+    @apply mb-2 block text-sm font-bold text-slate-700;
+  }
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded transition-colors w-full sm:w-auto text-center;
+  }
+  .card {
+    @apply bg-white border border-gray-200 rounded p-4 shadow-sm;
+  }
+  .input-field {
+    @apply w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Hide scrollbar for horizontal scroll areas but keep functionality */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
