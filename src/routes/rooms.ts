@@ -267,11 +267,12 @@ router.post("/:id/promote", authenticateToken, (req: any, res: any) => {
   }
 
   try {
-    const userStmt = db.prepare("SELECT subscriptionPlan FROM users WHERE id = ?");
+    const userStmt = db.prepare("SELECT subscriptionPlan, isPremium FROM users WHERE id = ?");
     const user = userStmt.get(req.user.id) as any;
+    const hasOwnerPremium = Boolean(user?.isPremium) || user?.subscriptionPlan === "premium";
 
-    if (req.user.role !== "admin" && user.subscriptionPlan !== "premium") {
-      return res.status(403).json({ error: "Premium subscription required to promote rooms" });
+    if (req.user.role !== "admin" && !hasOwnerPremium) {
+      return res.status(403).json({ error: "Owner premium is required to promote rooms" });
     }
 
     const checkStmt = db.prepare("SELECT ownerId FROM rooms WHERE id = ?");

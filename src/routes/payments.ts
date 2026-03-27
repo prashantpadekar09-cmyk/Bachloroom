@@ -40,10 +40,11 @@ const getDailyRate = (roomPrice: number) => Math.max(1, Math.round((Number(roomP
 
 const calculatePaymentBreakdown = (roomPrice: number, bookingData: any = {}) => {
   const duration = Math.max(1, Number(bookingData.duration) || 1);
+  const people = Math.max(1, Number(bookingData.people) || 1);
   const packageList = normalizePackageList(bookingData.moveInPackage);
   const dailyRate = getDailyRate(roomPrice);
   const packageTotalPerDay = packageList.reduce((sum, item) => sum + Math.round((packageCosts[item] || 0) / 30), 0);
-  const baseRent = dailyRate * duration;
+  const baseRent = dailyRate * duration * people;
   const packageTotal = packageTotalPerDay * duration;
   const subtotal = baseRent + packageTotal;
   const platformFee = Math.round(subtotal * 0.03);
@@ -52,6 +53,7 @@ const calculatePaymentBreakdown = (roomPrice: number, bookingData: any = {}) => 
 
   return {
     duration,
+    people,
     dailyRate,
     packageList,
     packageTotal,

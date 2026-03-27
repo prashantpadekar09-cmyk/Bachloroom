@@ -39,6 +39,8 @@ export default function OwnerDashboard() {
     setTimeout(() => setToast(null), 3000);
   };
 
+  const canPromoteRooms = user?.role === "admin" || Boolean(premiumStatus?.isPremium);
+
   const parseImageInput = (value: string) => {
     const input = value.trim();
     if (!input) {
@@ -1036,9 +1038,15 @@ export default function OwnerDashboard() {
                   {!room.isFeatured && (
                     <button
                       onClick={() => handlePromote(room.id)}
-                      className="flex-1 text-center bg-yellow-50 hover:bg-yellow-100 text-yellow-700 font-medium py-2 rounded-lg transition-colors border border-yellow-200"
+                      disabled={!canPromoteRooms}
+                      title={canPromoteRooms ? "Promote this room to featured" : "Owner premium is required to promote rooms"}
+                      className={`flex-1 text-center font-medium py-2 rounded-lg transition-colors border ${
+                        canPromoteRooms
+                          ? "bg-yellow-50 hover:bg-yellow-100 text-yellow-700 border-yellow-200"
+                          : "cursor-not-allowed bg-gray-100 text-gray-400 border-gray-200"
+                      }`}
                     >
-                      Promote
+                      {canPromoteRooms ? "Promote" : "Premium Required"}
                     </button>
                   )}
                 </div>

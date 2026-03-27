@@ -226,7 +226,8 @@ Is this price 'Fair', 'Overpriced', or a 'Good Deal'? Respond with ONLY ONE of t
 
     const dailyRate = getDailyRate(room.price);
     const packageDailyTotal = Math.round(getPackageTotal() / 30);
-    const baseRent = dailyRate * bookingData.duration;
+    const peopleCount = Math.max(1, Number(bookingData.people) || 1);
+    const baseRent = dailyRate * bookingData.duration * peopleCount;
     const packageTotal = packageDailyTotal * bookingData.duration;
     const subtotal = baseRent + packageTotal;
     const platformFee = Math.round(subtotal * 0.03);
@@ -329,7 +330,10 @@ Is this price 'Fair', 'Overpriced', or a 'Good Deal'? Respond with ONLY ONE of t
   const priceDisplay = room.priceLabel || (room.price > 0 ? `Rs. ${room.price}` : "Check source");
   const dailyRate = getDailyRate(room.price);
   const packageDailyTotal = Math.round(getPackageTotal() / 30);
-  const subtotal = (dailyRate + packageDailyTotal) * bookingData.duration;
+  const peopleCount = Math.max(1, Number(bookingData.people) || 1);
+  const stayCost = dailyRate * bookingData.duration * peopleCount;
+  const packageCost = packageDailyTotal * bookingData.duration;
+  const subtotal = stayCost + packageCost;
   const platformFee = Math.round(subtotal * 0.03);
   const totalAmount = subtotal + platformFee;
   const depositText = room.depositLabel || (room.deposit ? `Rs. ${room.deposit}` : "Deposit on request");
@@ -764,19 +768,19 @@ Is this price 'Fair', 'Overpriced', or a 'Good Deal'? Respond with ONLY ONE of t
                         </div>
                       </div>
 
-                      <div className="mt-6 space-y-2 border-t border-gray-100 pt-4 text-sm">
-                        <div className="flex justify-between text-gray-600">
-                          <span>
-                            Stay Cost (Rs. {dailyRate} x {bookingData.duration} days)
+                        <div className="mt-6 space-y-2 border-t border-gray-100 pt-4 text-sm">
+                          <div className="flex justify-between text-gray-600">
+                            <span>
+                            Stay Cost (Rs. {dailyRate} x {bookingData.duration} days x {peopleCount} {peopleCount === 1 ? "person" : "people"})
                           </span>
-                          <span>Rs. {dailyRate * bookingData.duration}</span>
+                          <span>Rs. {stayCost}</span>
                         </div>
                         {packageDailyTotal > 0 && (
                           <div className="flex justify-between text-gray-600">
                             <span>
                               Packages (Rs. {packageDailyTotal} x {bookingData.duration} days)
                             </span>
-                            <span>Rs. {packageDailyTotal * bookingData.duration}</span>
+                            <span>Rs. {packageCost}</span>
                           </div>
                         )}
                         <div className="flex justify-between text-gray-600">
