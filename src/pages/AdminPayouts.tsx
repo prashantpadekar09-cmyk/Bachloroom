@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Wallet, CheckCircle, XCircle, Clock, Loader2, ArrowUpRight, Search } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { AdminPageHero, AdminSurface } from "../components/admin/AdminTheme";
 
 const DEFAULT_OWNER_UPI = "prashantpadekar09@oksbi";
 
@@ -74,30 +75,29 @@ export default function AdminPayouts() {
 
   return (
     <div className="space-y-8">
-      {/* Header & Search */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight">Payout Management</h1>
-          <p className="text-gray-500 font-medium">Review and process owner withdrawal requests</p>
-        </div>
+      <AdminPageHero
+        eyebrow="Finance Ops"
+        title="Payout Management"
+        description="Review owner withdrawal requests and process settlements from one premium finance panel."
+        badge={`${filteredPayouts.length} requests`}
+      >
         <div className="relative w-full md:w-96">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/65" />
           <input
             type="text"
             placeholder="Search by owner name or ID..."
-            className="w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            className="w-full rounded-2xl border border-white/15 bg-white/10 py-3 pl-12 pr-4 text-white placeholder:text-white/60 outline-none backdrop-blur-md transition focus:border-white/30"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-      </div>
+      </AdminPageHero>
 
-      {/* Payouts Table */}
-      <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+      <AdminSurface className="overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50/50">
+              <tr className="bg-slate-50/80">
                 <th className="px-8 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest">Owner</th>
                 <th className="px-8 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest">Amount</th>
                 <th className="px-8 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest">UPI ID</th>
@@ -106,9 +106,9 @@ export default function AdminPayouts() {
                 <th className="px-8 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-slate-100">
               {filteredPayouts.map((payout) => (
-                <tr key={payout.id} className="hover:bg-gray-50/50 transition-colors group">
+                <tr key={payout.id} className="group transition-colors hover:bg-sky-50/40">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
@@ -189,7 +189,7 @@ export default function AdminPayouts() {
             </tbody>
           </table>
         </div>
-      </div>
+      </AdminSurface>
     </div>
   );
 }

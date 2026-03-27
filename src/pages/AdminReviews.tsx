@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Trash2, Star, Loader2, AlertCircle, Search, Filter, MessageSquare, User, Home, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { AdminPageHero, AdminSurface } from "../components/admin/AdminTheme";
 
 interface Review {
   id: string;
@@ -92,36 +93,36 @@ export default function AdminReviews() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-gray-900">Review Management</h1>
-          <p className="text-gray-500 mt-1">Monitor and moderate user feedback</p>
-        </div>
-        
+      <AdminPageHero
+        eyebrow="Ratings & Feedback"
+        title="Review Management"
+        description="Moderate reviews, watch sentiment, and keep listing quality high."
+        badge={`${filteredReviews.length} reviews`}
+      >
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/65" />
             <input 
               type="text"
               placeholder="Search reviews..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 pr-6 py-3 bg-white border border-gray-100 rounded-2xl w-full md:w-80 focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm outline-none transition-all"
+              className="w-full rounded-2xl border border-white/15 bg-white/10 py-3 pl-12 pr-6 text-white placeholder:text-white/60 outline-none backdrop-blur-md transition focus:border-white/30 md:w-80"
             />
           </div>
-          <button className="p-3 bg-white border border-gray-100 rounded-2xl text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">
+          <button className="rounded-2xl border border-white/15 bg-white/10 p-3 text-white/90 backdrop-blur-md transition hover:bg-white/15">
             <Filter className="h-5 w-5" />
           </button>
         </div>
-      </div>
+      </AdminPageHero>
       
       {filteredReviews.length === 0 ? (
-        <div className="py-20 text-center bg-white rounded-[2.5rem] border border-gray-100">
+        <AdminSurface className="py-20 text-center">
           <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <Star className="h-10 w-10 text-gray-300" />
           </div>
           <p className="text-gray-500 font-bold">No reviews found.</p>
-        </div>
+        </AdminSurface>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <AnimatePresence mode="popLayout">
@@ -132,7 +133,7 @@ export default function AdminReviews() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 group"
+                className="rounded-[2rem] border border-white/70 bg-white/90 p-6 shadow-[0_30px_90px_-55px_rgba(15,23,42,0.28)] backdrop-blur-xl transition-all duration-300 group hover:-translate-y-1"
               >
                 <div className="flex justify-between items-start mb-6">
                   <div className="flex items-center gap-4">

@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { motion } from "motion/react";
 import GoogleAuthButton from "../components/GoogleAuthButton";
 import { getAuthRedirectPath } from "../utils/authRedirect";
+import { ArrowRight, FileBadge2 } from "lucide-react";
 
 const DISPOSABLE_DOMAINS = new Set([
   "10minutemail.com",
@@ -182,123 +183,171 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-transparent py-12 px-4 sm:px-6 lg:px-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="ambient-surface-strong max-w-md w-full space-y-8 p-8 rounded-2xl"
-      >
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Create an account</h2>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <input
-                type="text"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <div>
-              <input
-                type="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (error) {
-                    setError("");
-                  }
-                }}
-              />
-            </div>
-            <div>
-              <input
-                type="tel"
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Phone Number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            </div>
-            <div>
-              <input
-                type="text"
-                required
-                inputMode="numeric"
-                maxLength={12}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Aadhaar Number"
-                value={aadhaarNumber}
-                onChange={(e) => {
-                  setAadhaarNumber(e.target.value.replace(/\D/g, ""));
-                  if (error) {
-                    setError("");
-                  }
-                }}
-              />
-            </div>
-            <div>
-              <input
-                type="password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <div>
-              <select
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-              >
-                <option value="user">I am looking for a room</option>
-                <option value="owner">I want to list my room</option>
-                <option value="service_provider">I provide services</option>
-              </select>
-            </div>
-            <div>
-              <label className="appearance-none rounded-none relative flex w-full cursor-pointer items-center justify-center border border-gray-300 bg-white px-3 py-3 text-sm text-gray-600 rounded-b-md focus-within:ring-2 focus-within:ring-blue-500">
-                {aadhaarImage ? "Aadhaar image uploaded" : "Upload Aadhaar Card Image"}
-                <input type="file" accept="image/*" className="hidden" onChange={handleAadhaarUpload} />
-              </label>
-            </div>
+    <div className="px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
+      <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[0.92fr_1.08fr]">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="overflow-hidden rounded-[2rem] border border-white/80 bg-[linear-gradient(145deg,#f8fbff_0%,#eaf4ff_100%)] p-6 text-slate-900 shadow-[0_36px_90px_-44px_rgba(59,130,246,0.2)] sm:p-8"
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white/75 px-3 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
+            <FileBadge2 className="h-4 w-4" />
+            Secure onboarding
           </div>
+          <h1 className="mt-6 text-3xl font-black tracking-tight sm:text-4xl">Create your account and enter the platform in one flow.</h1>
+          <p className="mt-4 max-w-md text-sm leading-7 text-slate-600 sm:text-base">
+            Tenants, owners, and service providers can join from the same mobile-friendly form with identity verification built in.
+          </p>
 
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-            >
-              Sign up
-            </button>
+          <div className="mt-8 grid gap-3">
+            {[
+              "Choose your role before dashboard access",
+              "Aadhaar upload included in signup",
+              "Works better on narrow mobile screens",
+            ].map((item) => (
+              <div key={item} className="rounded-2xl border border-white/80 bg-white/72 px-4 py-3 text-sm text-slate-700 shadow-sm">
+                {item}
+              </div>
+            ))}
           </div>
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-3 text-gray-500">or</span>
-            </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="ambient-surface-strong rounded-[2rem] p-5 sm:p-8"
+        >
+          <div className="mx-auto max-w-xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">New account</p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Sign up</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-500">Fill in your details once and get routed to the right dashboard.</p>
+
+            <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+              {error && <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">{error}</div>}
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="block sm:col-span-2">
+                  <span className="mb-2 block text-sm font-semibold text-slate-700">Full name</span>
+                  <input
+                    type="text"
+                    required
+                    className="ui-input"
+                    placeholder="Your full name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </label>
+
+                <label className="block sm:col-span-2">
+                  <span className="mb-2 block text-sm font-semibold text-slate-700">Email address</span>
+                  <input
+                    type="email"
+                    required
+                    className="ui-input"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (error) {
+                        setError("");
+                      }
+                    }}
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold text-slate-700">Phone number</span>
+                  <input
+                    type="tel"
+                    className="ui-input"
+                    placeholder="9876543210"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold text-slate-700">Role</span>
+                  <select
+                    className="ui-input"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                  >
+                    <option value="user">I am looking for a room</option>
+                    <option value="owner">I want to list my room</option>
+                    <option value="service_provider">I provide services</option>
+                  </select>
+                </label>
+
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold text-slate-700">Aadhaar number</span>
+                  <input
+                    type="text"
+                    required
+                    inputMode="numeric"
+                    maxLength={12}
+                    className="ui-input"
+                    placeholder="12-digit Aadhaar"
+                    value={aadhaarNumber}
+                    onChange={(e) => {
+                      setAadhaarNumber(e.target.value.replace(/\D/g, ""));
+                      if (error) {
+                        setError("");
+                      }
+                    }}
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold text-slate-700">Password</span>
+                  <input
+                    type="password"
+                    required
+                    className="ui-input"
+                    placeholder="Create a password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </label>
+
+                <div className="block sm:col-span-2">
+                  <span className="mb-2 block text-sm font-semibold text-slate-700">Identity upload</span>
+                  <label className="flex min-h-[56px] w-full cursor-pointer items-center justify-center rounded-2xl border border-dashed border-sky-200 bg-sky-50/60 px-4 py-3 text-center text-sm font-medium text-slate-600 transition hover:border-sky-300 hover:bg-sky-50">
+                    {aadhaarImage ? "Aadhaar image uploaded" : "Upload Aadhaar card image"}
+                    <input type="file" accept="image/*" className="hidden" onChange={handleAadhaarUpload} />
+                  </label>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#2563eb_0%,#38bdf8_100%)] px-4 py-3 text-sm font-bold text-white transition hover:brightness-105"
+              >
+                Sign up
+                <ArrowRight className="h-4 w-4" />
+              </button>
+
+              <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-3 text-slate-400">or continue with</span>
+                </div>
+              </div>
+
+              <GoogleAuthButton mode="signup" onCredential={handleGoogleSignup} onError={setError} />
+
+              <div className="text-center text-sm text-slate-600">
+                Already have an account?{" "}
+                <Link to="/login" className="font-semibold text-sky-700 hover:text-sky-800">
+                  Sign in
+                </Link>
+              </div>
+            </form>
           </div>
-          <GoogleAuthButton mode="signup" onCredential={handleGoogleSignup} onError={setError} />
-          <div className="text-center text-sm text-gray-600">
-            Already have an account?{" "}
-            <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-              Sign in
-            </Link>
-          </div>
-        </form>
-      </motion.div>
+        </motion.div>
+      </div>
     </div>
   );
 }

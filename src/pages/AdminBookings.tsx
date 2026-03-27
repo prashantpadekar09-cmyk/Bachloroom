@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { CheckCircle, XCircle, Search, Filter, Calendar, User, Home, IndianRupee, Loader2, Clock, Check, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { AdminPageHero, AdminSurface } from "../components/admin/AdminTheme";
 
 interface Booking {
   id: string;
@@ -75,34 +76,34 @@ export default function AdminBookings() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-gray-900">Booking Management</h1>
-          <p className="text-gray-500 mt-1">Track and manage all room reservations</p>
-        </div>
-        
+      <AdminPageHero
+        eyebrow="Reservations"
+        title="Booking Management"
+        description="Track reservation flow, monitor pending requests, and approve bookings faster."
+        badge={`${filteredBookings.length} bookings`}
+      >
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/65" />
             <input 
               type="text"
               placeholder="Search bookings..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 pr-6 py-3 bg-white border border-gray-100 rounded-2xl w-full md:w-80 focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm outline-none transition-all"
+              className="w-full rounded-2xl border border-white/15 bg-white/10 py-3 pl-12 pr-6 text-white placeholder:text-white/60 outline-none backdrop-blur-md transition focus:border-white/30 md:w-80"
             />
           </div>
-          <button className="p-3 bg-white border border-gray-100 rounded-2xl text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">
+          <button className="rounded-2xl border border-white/15 bg-white/10 p-3 text-white/90 backdrop-blur-md transition hover:bg-white/15">
             <Filter className="h-5 w-5" />
           </button>
         </div>
-      </div>
+      </AdminPageHero>
 
-      <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+      <AdminSurface className="overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50/50 border-b border-gray-100">
+              <tr className="border-b border-slate-100 bg-slate-50/80">
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Customer</th>
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Property</th>
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Amount</th>
@@ -111,7 +112,7 @@ export default function AdminBookings() {
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-slate-100">
               <AnimatePresence mode="popLayout">
                 {filteredBookings.map((booking) => (
                   <motion.tr 
@@ -120,7 +121,7 @@ export default function AdminBookings() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="hover:bg-gray-50/50 transition-colors group"
+                    className="group transition-colors hover:bg-sky-50/40"
                   >
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">
@@ -202,7 +203,7 @@ export default function AdminBookings() {
             <p className="text-gray-500 font-bold">No bookings found.</p>
           </div>
         )}
-      </div>
+      </AdminSurface>
     </div>
   );
 }

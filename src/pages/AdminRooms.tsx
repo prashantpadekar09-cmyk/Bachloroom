@@ -3,6 +3,7 @@ import { CheckCircle, Edit, Trash2, Search, Filter, MapPin, IndianRupee, Loader2
 import { motion, AnimatePresence } from "motion/react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { AdminPageHero, AdminSurface } from "../components/admin/AdminTheme";
 
 interface Room {
   id: string;
@@ -288,39 +289,39 @@ export default function AdminRooms() {
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-gray-900">Room Management</h1>
-          <p className="text-gray-500 mt-1">Monitor and manage all property listings</p>
-        </div>
-        
+      <AdminPageHero
+        eyebrow="Listing Control"
+        title="Room Management"
+        description="Monitor listings, refine sourcing mix, and edit property details from one elevated workspace."
+        badge={`${filteredRooms.length} live listings`}
+      >
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/65" />
             <input 
               type="text"
               placeholder="Search listings..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 pr-6 py-3 bg-white border border-gray-100 rounded-2xl w-full md:w-80 focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm outline-none transition-all"
+              className="w-full rounded-2xl border border-white/15 bg-white/10 py-3 pl-12 pr-6 text-white placeholder:text-white/60 outline-none backdrop-blur-md transition focus:border-white/30 md:w-80"
             />
           </div>
           <button
             type="button"
             onClick={() => setShowFilters((prev) => !prev)}
-            className={`p-3 rounded-2xl transition-colors shadow-sm border ${
+            className={`rounded-2xl border p-3 transition-colors ${
               showFilters
-                ? "bg-blue-50 border-blue-200 text-blue-600"
-                : "bg-white border-gray-100 text-gray-600 hover:bg-gray-50"
+                ? "border-white/25 bg-white/20 text-white"
+                : "border-white/15 bg-white/10 text-white/90 hover:bg-white/15"
             }`}
           >
             <Filter className="h-5 w-5" />
           </button>
         </div>
-      </div>
+      </AdminPageHero>
 
       {showFilters && (
-        <div className="grid grid-cols-1 gap-4 rounded-[2rem] border border-gray-100 bg-white p-5 shadow-sm md:grid-cols-3">
+        <AdminSurface className="grid grid-cols-1 gap-4 p-5 md:grid-cols-3">
           <div>
             <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400">City</label>
             <select
@@ -360,7 +361,7 @@ export default function AdminRooms() {
               Clear Filters
             </button>
           </div>
-        </div>
+        </AdminSurface>
       )}
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -375,7 +376,7 @@ export default function AdminRooms() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-white p-5 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-6 hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 group"
+                className="group flex flex-col gap-6 rounded-[2rem] border border-white/70 bg-white/90 p-5 shadow-[0_30px_90px_-55px_rgba(15,23,42,0.28)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 sm:flex-row"
               >
                 <div className="w-full sm:w-48 h-48 rounded-[2rem] overflow-hidden flex-shrink-0 relative">
                   <img 

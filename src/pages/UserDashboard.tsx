@@ -26,6 +26,13 @@ import {
   MessageSquare
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import {
+  DashboardHero,
+  DashboardLoading,
+  DashboardShell,
+  DashboardStatCard,
+  DashboardSurface,
+} from "../components/dashboard/DashboardTheme";
 
 type Tab = "profile" | "premium" | "bookings" | "saved" | "messages" | "settings";
 
@@ -340,11 +347,7 @@ export default function UserDashboard() {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <DashboardLoading label="Loading your renter dashboard..." />;
   }
 
   const tabs = [
@@ -356,38 +359,82 @@ export default function UserDashboard() {
     { id: "settings", label: "Settings", icon: SettingsIcon },
   ];
 
-  return (
-    <div className="min-h-screen bg-transparent pb-12">
-      {/* Top Header */}
-      <div className="ambient-surface">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
-                <User className="h-8 w-8" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{user?.name}</h1>
-                <p className="text-gray-500 flex items-center gap-1">
-                  <Mail className="h-3 w-3" /> {user?.email}
-                </p>
-              </div>
-            </div>
-            <button 
-              onClick={logout}
-              className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
-            >
-              <LogOut className="h-4 w-4" /> Logout
-            </button>
-          </div>
-        </div>
-      </div>
+  const dashboardStats = [
+    {
+      icon: Calendar,
+      label: "Bookings",
+      value: bookings.length,
+      accent: "blue" as const,
+      hint: bookings.length ? "Track active stays and payment progress." : "Your first booking will appear here.",
+    },
+    {
+      icon: Heart,
+      label: "Saved Rooms",
+      value: savedRooms.length,
+      accent: "rose" as const,
+      hint: savedRooms.length ? "Wishlist rooms stay ready for quick access." : "Save rooms to compare later.",
+    },
+    {
+      icon: ShieldCheck,
+      label: "Verification",
+      value: isVerified ? "Verified" : hasDocument ? "Pending" : "Needed",
+      accent: "emerald" as const,
+      hint: isVerified ? "Identity checks are complete." : "Verification unlocks stronger trust signals.",
+    },
+    {
+      icon: Crown,
+      label: "Premium",
+      value: isPremium ? "Active" : "Free",
+      accent: "amber" as const,
+      hint: isPremium ? "Owner contact access is unlocked." : "Upgrade for direct owner details.",
+    },
+  ];
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+  return (
+    <DashboardShell>
+      <div className="space-y-8 pb-10">
+        <DashboardHero
+          eyebrow="Renter Dashboard"
+          title={user?.name ? `${user.name}, your room journey is organized.` : "Your renter workspace is ready."}
+          description="Manage bookings, premium access, saved rooms, and support requests from one clean, mobile-friendly dashboard."
+          badge={user?.email || "Tenant account"}
+          actions={
+            <>
+              <Link
+                to="/explore"
+                className="inline-flex items-center justify-center rounded-2xl border border-white/80 bg-white/80 px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur-md transition hover:bg-white"
+              >
+                Explore Rooms
+              </Link>
+              <button
+                onClick={logout}
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
+            </>
+          }
+        />
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {dashboardStats.map((stat) => (
+            <div key={stat.label}>
+              <DashboardStatCard
+                icon={stat.icon}
+                label={stat.label}
+                value={stat.value}
+                accent={stat.accent}
+                hint={stat.hint}
+              />
+            </div>
+          ))}
+        </div>
+
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
-          {/* Sidebar Navigation */}
           <div className="flex-shrink-0 lg:w-64">
-            <nav className="hide-scrollbar flex gap-2 overflow-x-auto rounded-2xl bg-white/70 p-2 shadow-sm ring-1 ring-white/70 lg:block lg:space-y-1 lg:overflow-visible lg:bg-transparent lg:p-0 lg:shadow-none lg:ring-0">
+            <DashboardSurface className="p-2 lg:p-3">
+              <nav className="hide-scrollbar flex gap-2 overflow-x-auto lg:block lg:space-y-1 lg:overflow-visible">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
@@ -410,10 +457,10 @@ export default function UserDashboard() {
                   )}
                 </button>
               ))}
-            </nav>
+              </nav>
+            </DashboardSurface>
           </div>
 
-          {/* Main Content Area */}
           <div className="flex-grow">
             <AnimatePresence mode="wait">
               {activeTab === "profile" && (
@@ -424,7 +471,7 @@ export default function UserDashboard() {
                   exit={{ opacity: 0, y: -10 }}
                   className="space-y-6"
                 >
-                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+                  <DashboardSurface className="p-8">
                     <div className="flex items-center justify-between mb-6">
                       <h2 className="text-xl font-bold text-gray-900">Profile Information</h2>
                       <button 
@@ -538,7 +585,7 @@ export default function UserDashboard() {
                         </div>
                       </div>
                     )}
-                  </div>
+                  </DashboardSurface>
                 </motion.div>
               )}
 
@@ -550,7 +597,7 @@ export default function UserDashboard() {
                   exit={{ opacity: 0, y: -10 }}
                   className="space-y-6"
                 >
-                  <div className="rounded-2xl border border-amber-100 bg-gradient-to-br from-white via-amber-50 to-orange-50 p-8 shadow-sm">
+                  <DashboardSurface className="border-amber-100 bg-gradient-to-br from-white via-amber-50 to-orange-50 p-8">
                     <div className="inline-flex items-center rounded-full bg-gray-900 px-4 py-1.5 text-sm font-semibold text-white">
                       <Crown className="mr-2 h-4 w-4 text-amber-300" />
                       Premium access
@@ -584,7 +631,7 @@ export default function UserDashboard() {
                     >
                       {isPremium ? "View Premium Access" : "Upgrade to Premium"}
                     </Link>
-                  </div>
+                  </DashboardSurface>
                 </motion.div>
               )}
 
@@ -596,7 +643,7 @@ export default function UserDashboard() {
                   exit={{ opacity: 0, y: -10 }}
                   className="space-y-6"
                 >
-                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  <DashboardSurface className="overflow-hidden p-0">
                     <div className="p-6 border-b border-gray-100">
                       <h2 className="text-xl font-bold text-gray-900">My Bookings</h2>
                     </div>
@@ -725,7 +772,7 @@ export default function UserDashboard() {
                         </table>
                       </div>
                     )}
-                  </div>
+                  </DashboardSurface>
                 </motion.div>
               )}
 
@@ -739,16 +786,17 @@ export default function UserDashboard() {
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {savedRooms.length === 0 ? (
-                      <div className="col-span-full bg-white p-12 rounded-2xl text-center border border-gray-100">
+                      <DashboardSurface className="col-span-full p-12 text-center">
                         <Heart className="h-12 w-12 text-gray-200 mx-auto mb-4" />
                         <p className="text-gray-500 mb-4">Your wishlist is empty.</p>
                         <Link to="/explore" className="text-blue-600 font-medium hover:underline">
                           Browse Rooms
                         </Link>
-                      </div>
+                      </DashboardSurface>
                     ) : (
                       savedRooms.map((room) => (
-                        <div key={room.savedId} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 group">
+                        <div key={room.savedId}>
+                          <DashboardSurface className="overflow-hidden p-0 group">
                           <div className="h-48 relative overflow-hidden">
                             <img 
                               src={room.images?.[0] || "https://picsum.photos/seed/room/400/300"} 
@@ -780,6 +828,7 @@ export default function UserDashboard() {
                               </button>
                             </div>
                           </div>
+                          </DashboardSurface>
                         </div>
                       ))
                     )}
@@ -795,7 +844,7 @@ export default function UserDashboard() {
                   exit={{ opacity: 0, y: -10 }}
                   className="space-y-6"
                 >
-                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+                  <DashboardSurface className="p-8">
                     <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                       <Lock className="h-5 w-5 text-gray-400" /> Change Password
                     </h2>
@@ -844,9 +893,9 @@ export default function UserDashboard() {
                         Update Password
                       </button>
                     </form>
-                  </div>
+                  </DashboardSurface>
 
-                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+                  <DashboardSurface className="p-8">
                     <h2 className="text-xl font-bold text-gray-900 mb-4">Account Actions</h2>
                     <p className="text-gray-500 text-sm mb-6">Manage your account preferences and data.</p>
                     <div className="flex flex-wrap gap-4">
@@ -863,7 +912,7 @@ export default function UserDashboard() {
                         Delete Account
                       </button>
                     </div>
-                  </div>
+                  </DashboardSurface>
                 </motion.div>
               )}
 
@@ -875,7 +924,7 @@ export default function UserDashboard() {
                   exit={{ opacity: 0, y: -10 }}
                   className="space-y-6"
                 >
-                  <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                  <DashboardSurface>
                     <h2 className="text-xl font-bold text-gray-900">Submit a query</h2>
                     <p className="mt-1 text-sm text-gray-500">
                       Send your question to admin. You can track replies in the Support inbox.
@@ -900,17 +949,17 @@ export default function UserDashboard() {
                           Open Support Inbox
                         </Link>
                       </div>
-                      {supportMessage && (
-                        <p className="text-sm text-gray-500">{supportMessage}</p>
-                      )}
-                    </form>
-                  </div>
+                    {supportMessage && (
+                      <p className="text-sm text-gray-500">{supportMessage}</p>
+                    )}
+                  </form>
+                  </DashboardSurface>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
         </div>
       </div>
-    </div>
+    </DashboardShell>
   );
 }

@@ -1,7 +1,7 @@
 {
   "name": "react-example",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.2.0",
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
@@ -10,10 +10,12 @@
     "preview": "vite preview",
     "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
     "lint": "tsc --noEmit",
-    "seed:demo": "tsx src/db/seed.ts"
+    "seed:demo": "tsx src/db/seed.ts",
+    "db:migrate:turso": "tsx src/db/migrateToTurso.ts"
   },
   "dependencies": {
     "@google/genai": "^1.46.0",
+    "@libsql/client": "^0.17.2",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
     "bcryptjs": "^3.0.3",

@@ -4,6 +4,7 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
 import { setupDb } from "./src/db/setup.js";
+import { initTursoMirror, isTursoMirrorEnabled, scheduleTursoSync } from "./src/db/tursoMirror.js";
 import authRoutes from "./src/routes/auth.js";
 import roomRoutes from "./src/routes/rooms.js";
 import bookingRoutes from "./src/routes/bookings.js";
@@ -29,6 +30,25 @@ async function startServer() {
 
   // Setup database
   setupDb();
+  await initTursoMirror();
+
+  app.use((req, res, next) => {
+    if (!isTursoMirrorEnabled()) {
+      return next();
+    }
+
+    if (!["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) {
+      return next();
+    }
+
+    res.on("finish", () => {
+      if (res.statusCode >= 200 && res.statusCode < 400) {
+        scheduleTursoSync(`${req.method} ${req.path}`);
+      }
+    });
+
+    next();
+  });
 
   // API Routes
   app.use("/api/auth", authRoutes);
@@ -45,7 +65,7 @@ async function startServer() {
   app.use("/api/support", supportRoutes);
 
   app.get("/api/health", (req, res) => {
-    res.json({ status: "ok" });
+    res.json({ status: "ok", persistence: isTursoMirrorEnabled() ? "turso-mirror" : "sqlite-local" });
   });
 
   // Vite middleware for development

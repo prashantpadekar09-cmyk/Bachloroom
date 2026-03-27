@@ -1,6 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Briefcase, Edit3, Mail, MapPin, Phone, Plus, Trash2 } from "lucide-react";
+import { Briefcase, Edit3, Mail, MapPin, Phone, Plus, Sparkles, Trash2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import {
+  DashboardHero,
+  DashboardLoading,
+  DashboardShell,
+  DashboardStatCard,
+  DashboardSurface,
+  DashboardToast,
+} from "../components/dashboard/DashboardTheme";
 
 type ServiceItem = {
   id: string;
@@ -259,40 +267,32 @@ export default function ServiceProviderDashboard() {
 
   if (user?.role && !["service_provider", "admin"].includes(user.role)) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <div className="rounded-[2rem] border border-amber-100 bg-amber-50 p-8">
+      <DashboardShell>
+        <DashboardSurface className="mx-auto max-w-3xl text-center">
           <h1 className="text-2xl font-black text-gray-900">Service provider access only</h1>
           <p className="mt-3 text-gray-600">Create a service-provider account to manage service listings from this dashboard.</p>
-        </div>
-      </div>
+        </DashboardSurface>
+      </DashboardShell>
     );
   }
 
+  if (loading && services.length === 0) {
+    return <DashboardLoading label="Loading your service dashboard..." />;
+  }
+
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <DashboardShell>
+      <div className="space-y-8 pb-10">
       {toast && (
-        <div
-          className={`fixed right-4 top-4 z-50 rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-lg ${
-            toast.type === "success" ? "bg-emerald-600" : "bg-rose-600"
-          }`}
-        >
-          {toast.message}
-        </div>
+        <DashboardToast message={toast.message} type={toast.type} />
       )}
 
-      <div className="mb-8 rounded-[2.5rem] border border-gray-100 bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white">
-              <Briefcase className="h-4 w-4" />
-              Service Provider Dashboard
-            </div>
-            <h1 className="mt-4 text-3xl font-black text-gray-900">Manage your service listings like an owner manages rooms.</h1>
-            <p className="mt-3 text-gray-600">
-              Add local services, keep provider contact details updated, and maintain a clean service catalog for users.
-            </p>
-          </div>
-
+      <DashboardHero
+        eyebrow="Service Provider Dashboard"
+        title="Run your service catalog with a polished, premium workspace."
+        description="Manage service listings, pricing, and provider details with the same premium control owners get for rooms."
+        badge={user?.email || "Provider account"}
+        actions={
           <button
             type="button"
             onClick={() => {
@@ -301,35 +301,23 @@ export default function ServiceProviderDashboard() {
                 resetForm();
               }
             }}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white transition-colors hover:bg-blue-700"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 font-semibold text-white transition-colors hover:bg-slate-800"
           >
             <Plus className="h-5 w-5" />
             {showForm ? "Hide Form" : "Add New Service"}
           </button>
-        </div>
-      </div>
+        }
+      />
 
-      <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-4">
-        <div className="rounded-[2rem] border border-gray-100 bg-white p-5 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-gray-400">Live Services</p>
-          <p className="mt-3 text-3xl font-black text-gray-900">{stats.totalServices}</p>
-        </div>
-        <div className="rounded-[2rem] border border-gray-100 bg-white p-5 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-gray-400">Categories</p>
-          <p className="mt-3 text-3xl font-black text-gray-900">{stats.categories}</p>
-        </div>
-        <div className="rounded-[2rem] border border-gray-100 bg-white p-5 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-gray-400">Cities Covered</p>
-          <p className="mt-3 text-3xl font-black text-gray-900">{stats.cities}</p>
-        </div>
-        <div className="rounded-[2rem] border border-gray-100 bg-white p-5 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-gray-400">Average Price</p>
-          <p className="mt-3 text-3xl font-black text-gray-900">Rs. {stats.averagePrice}</p>
-        </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <DashboardStatCard icon={Briefcase} label="Live Services" value={stats.totalServices} accent="blue" hint="Published services ready for discovery." />
+        <DashboardStatCard icon={Sparkles} label="Categories" value={stats.categories} accent="indigo" hint="Broader categories improve marketplace coverage." />
+        <DashboardStatCard icon={MapPin} label="Cities" value={stats.cities} accent="emerald" hint="Expand city coverage to attract more demand." />
+        <DashboardStatCard icon={Phone} label="Average Price" value={`Rs. ${stats.averagePrice}`} accent="amber" hint="Keep your pricing competitive and clear." />
       </div>
 
       {showForm && (
-        <div className="mb-8 rounded-[2rem] border border-gray-100 bg-white p-6 shadow-sm">
+        <DashboardSurface className="mb-8">
           <h2 className="mb-6 text-2xl font-black text-gray-900">
             {editingServiceId ? "Edit Service" : "Add New Service"}
           </h2>
@@ -464,10 +452,10 @@ export default function ServiceProviderDashboard() {
               </button>
             </div>
           </form>
-        </div>
+        </DashboardSurface>
       )}
 
-      <div className="rounded-[2rem] border border-gray-100 bg-white p-6 shadow-sm">
+      <DashboardSurface>
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-black text-gray-900">My Services</h2>
@@ -566,7 +554,8 @@ export default function ServiceProviderDashboard() {
             ))}
           </div>
         )}
+      </DashboardSurface>
       </div>
-    </div>
+    </DashboardShell>
   );
 }

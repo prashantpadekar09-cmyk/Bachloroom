@@ -22,7 +22,7 @@ const ServicesMarketplace = lazy(() => import("./pages/ServicesMarketplacePage")
 const Explore = lazy(() => import("./pages/Explore"));
 const PremiumPayment = lazy(() => import("./pages/PremiumPayment"));
 const SupportInbox = lazy(() => import("./pages/SupportInbox"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboardPremium"));
 const AdminVerifications = lazy(() => import("./pages/AdminVerifications"));
 const AdminRooms = lazy(() => import("./pages/AdminRooms"));
 const AdminServices = lazy(() => import("./pages/AdminServices"));
@@ -52,17 +52,16 @@ function AppShell() {
   return (
     <div className="site-shell">
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,#fbfdff_0%,#eef4ff_46%,#fff7ed_100%)]" />
-        <div className="ambient-grid absolute inset-0 opacity-60" />
-        <div className="absolute -left-20 top-0 h-80 w-80 rounded-full bg-sky-300/35 blur-3xl" />
-        <div className="absolute right-[-8rem] top-20 h-[30rem] w-[30rem] rounded-full bg-blue-400/20 blur-[140px]" />
-        <div className="absolute bottom-[-8rem] left-1/3 h-80 w-80 rounded-full bg-amber-200/45 blur-[120px]" />
-        <div className="absolute bottom-8 left-[-5rem] h-64 w-64 rounded-full bg-cyan-200/30 blur-[100px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#f8fbff_0%,#eef6ff_50%,#f8fafc_100%)]" />
+        <div className="ambient-grid absolute inset-0 opacity-30" />
+        <div className="absolute left-[-5rem] top-0 h-72 w-72 rounded-full bg-sky-200/45 blur-[110px]" />
+        <div className="absolute right-[-8rem] top-12 h-[24rem] w-[24rem] rounded-full bg-cyan-200/35 blur-[120px]" />
+        <div className="absolute bottom-[-6rem] left-1/4 h-72 w-72 rounded-full bg-indigo-200/35 blur-[120px]" />
       </div>
 
       <div className="relative z-10 flex min-h-screen flex-col">
         {!hideSharedNavbar && <Navbar />}
-        <main className="flex-grow">
+        <main className={`flex-grow ${hideSharedNavbar ? "" : "pb-24 lg:pb-0"}`}>
           <Suspense fallback={<RouteFallback />}>
             <Routes>
               <Route path="/" element={<Home />} />

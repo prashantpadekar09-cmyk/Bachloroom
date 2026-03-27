@@ -3,6 +3,13 @@ import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import { Plus, CheckCircle, XCircle, Clock, MapPin, Wallet, TrendingUp, History, Crown, MessageSquare } from "lucide-react";
 import { GoogleGenAI } from "@google/genai";
+import {
+  DashboardHero,
+  DashboardLoading,
+  DashboardShell,
+  DashboardSurface,
+  DashboardToast,
+} from "../components/dashboard/DashboardTheme";
 
 export default function OwnerDashboard() {
   const { user, token, updateUser } = useAuth();
@@ -376,34 +383,36 @@ export default function OwnerDashboard() {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <DashboardLoading label="Loading your owner dashboard..." />;
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
-      {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium transition-all duration-300 ${
-          toast.type === 'success' ? 'bg-green-500' : toast.type === 'error' ? 'bg-red-500' : 'bg-blue-500'
-        }`}>
-          {toast.message}
-        </div>
-      )}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Owner Dashboard</h1>
-        <div className="flex gap-4">
-          <button
-            onClick={() => setShowAddRoom(!showAddRoom)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center"
-          >
-            <Plus className="h-5 w-5 mr-2" />
-            {showAddRoom ? "Hide Form" : "Add New Room"}
-          </button>
-        </div>
-      </div>
+    <DashboardShell>
+      <div className="space-y-8 pb-10">
+      {toast && <DashboardToast message={toast.message} type={toast.type} />}
+      <DashboardHero
+        eyebrow="Owner Dashboard"
+        title="Manage listings, payouts, and booking approvals with confidence."
+        description="This owner workspace keeps your rooms, premium status, rent verification, and support communication in one polished control center."
+        badge={premiumStatus?.isPremium ? "Premium owner" : "Free owner plan"}
+        actions={
+          <>
+            <Link
+              to="/support"
+              className="inline-flex items-center justify-center rounded-2xl border border-white/80 bg-white/80 px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur-md transition hover:bg-white"
+            >
+              Open Support
+            </Link>
+            <button
+              onClick={() => setShowAddRoom(!showAddRoom)}
+              className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 font-semibold text-white transition-colors hover:bg-slate-800"
+            >
+              <Plus className="h-5 w-5" />
+              {showAddRoom ? "Hide Form" : "Add New Room"}
+            </button>
+          </>
+        }
+      />
 
       {/* Earnings Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -452,7 +461,7 @@ export default function OwnerDashboard() {
         </div>
       </div>
 
-      <div className="mb-8 overflow-hidden rounded-2xl border border-amber-100 bg-gradient-to-br from-white via-amber-50 to-orange-50 p-6 shadow-sm">
+      <DashboardSurface className="mb-8 overflow-hidden border-amber-100 bg-gradient-to-br from-white via-amber-50 to-orange-50">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl">
             <div className="inline-flex items-center rounded-full bg-gray-900 px-4 py-1.5 text-sm font-semibold text-white">
@@ -485,9 +494,9 @@ export default function OwnerDashboard() {
             </Link>
           </div>
         </div>
-      </div>
+      </DashboardSurface>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+      <DashboardSurface className="mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Request Payout</h2>
         <form onSubmit={handleRequestPayout} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -522,7 +531,7 @@ export default function OwnerDashboard() {
             {isPayoutRequesting ? "Requesting..." : "Request Payout"}
           </button>
         </form>
-      </div>
+      </DashboardSurface>
 
       {false && (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -1217,6 +1226,7 @@ export default function OwnerDashboard() {
           </form>
         </div>
       )}
-    </div>
+      </div>
+    </DashboardShell>
   );
 }

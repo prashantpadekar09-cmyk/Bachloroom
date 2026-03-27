@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { CheckCircle2, CircleAlert, Loader2, SendHorizontal } from "lucide-react";
+import { AdminPageHero, AdminSurface } from "../components/admin/AdminTheme";
 
 type QuerySummary = {
   id: string;
@@ -232,13 +233,15 @@ export default function AdminMessages() {
   }
 
   return (
-    <div className="space-y-4 rounded-[2rem] bg-gradient-to-br from-slate-50 via-white to-blue-50 p-4 sm:p-6">
-      <div>
-        <h1 className="text-3xl font-black text-gray-900">Admin Query Chat</h1>
-        <p className="mt-1 text-gray-500">Reply quickly and manage query status in one chat view.</p>
-      </div>
+    <div className="space-y-6">
+      <AdminPageHero
+        eyebrow="Support Inbox"
+        title="Admin Query Chat"
+        description="Reply quickly, manage resolution status, and keep support conversations organized."
+        badge={`${queries.length} open threads`}
+      />
 
-      <div className="overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-sm shadow-blue-100/40">
+      <AdminSurface className="overflow-hidden">
         <div className="flex min-h-[70vh] flex-col lg:flex-row">
           <aside className="border-b border-gray-100 bg-slate-50 lg:w-[320px] lg:border-b-0 lg:border-r">
             <div className="border-b border-gray-100 px-4 py-4">
@@ -404,7 +407,7 @@ export default function AdminMessages() {
             )}
           </div>
         </div>
-      </div>
+      </AdminSurface>
 
       {error && (
         <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
