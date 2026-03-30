@@ -94,10 +94,10 @@ export default function AdminPayouts() {
       </AdminPageHero>
 
       <AdminSurface className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="luxury-table-wrap">
+          <table className="luxury-table">
             <thead>
-              <tr className="bg-slate-50/80">
+              <tr>
                 <th className="px-8 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest">Owner</th>
                 <th className="px-8 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest">Amount</th>
                 <th className="px-8 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest">UPI ID</th>
@@ -106,9 +106,9 @@ export default function AdminPayouts() {
                 <th className="px-8 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               {filteredPayouts.map((payout) => (
-                <tr key={payout.id} className="group transition-colors hover:bg-sky-50/40">
+                <tr key={payout.id} className="group luxury-table-row">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">

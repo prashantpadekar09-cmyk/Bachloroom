@@ -223,10 +223,10 @@ export default function AdminDashboard() {
         <div className="px-6 py-5 border-b border-gray-100">
           <h2 className="text-xl font-black text-gray-900">Premium Payment Requests</h2>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="luxury-table-wrap">
+          <table className="luxury-table">
             <thead>
-              <tr className="bg-gray-50/50">
+              <tr>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">User</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">UTR</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Amount</th>
@@ -235,7 +235,7 @@ export default function AdminDashboard() {
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody>
               {premiumRequests.map((request) => (
                 <tr key={request.id}>
                   <td className="px-6 py-4">
@@ -301,10 +301,10 @@ export default function AdminDashboard() {
         <div className="px-6 py-5 border-b border-gray-100">
           <h2 className="text-xl font-black text-gray-900">Recent Payment Transactions</h2>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="luxury-table-wrap">
+          <table className="luxury-table">
             <thead>
-              <tr className="bg-gray-50/50">
+              <tr>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Room</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Tenant</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Owner</th>
@@ -316,7 +316,7 @@ export default function AdminDashboard() {
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody>
               {transactions.slice(0, 10).map((tx) => (
                 <tr key={tx.id}>
                   <td className="px-6 py-4 font-medium text-gray-900">{tx.roomTitle}</td>

@@ -239,10 +239,10 @@ export default function AdminUsers() {
       )}
 
       <AdminSurface className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="luxury-table-wrap">
+          <table className="luxury-table">
             <thead>
-              <tr className="border-b border-slate-100 bg-slate-50/80">
+              <tr>
                 <th className="px-8 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest">User Details</th>
                 <th className="px-8 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest">Contact</th>
                 <th className="px-8 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest">Status</th>
@@ -251,7 +251,7 @@ export default function AdminUsers() {
                 <th className="px-8 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               <AnimatePresence mode="popLayout">
                 {filteredUsers.map((user) => (
                   <motion.tr 
@@ -260,7 +260,7 @@ export default function AdminUsers() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="group transition-colors hover:bg-sky-50/40"
+                    className="group luxury-table-row"
                   >
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">

@@ -100,10 +100,10 @@ export default function AdminBookings() {
       </AdminPageHero>
 
       <AdminSurface className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="luxury-table-wrap">
+          <table className="luxury-table">
             <thead>
-              <tr className="border-b border-slate-100 bg-slate-50/80">
+              <tr>
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Customer</th>
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Property</th>
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Amount</th>
@@ -112,7 +112,7 @@ export default function AdminBookings() {
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               <AnimatePresence mode="popLayout">
                 {filteredBookings.map((booking) => (
                   <motion.tr 
@@ -121,7 +121,7 @@ export default function AdminBookings() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="group transition-colors hover:bg-sky-50/40"
+                    className="group luxury-table-row"
                   >
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">

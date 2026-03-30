@@ -242,30 +242,30 @@ export default function AdminDashboardPremium() {
         </div>
       ) : null}
 
-      <section className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_48%,#60a5fa_100%)] p-6 text-white shadow-[0_35px_120px_-50px_rgba(37,99,235,0.8)] sm:p-8">
-        <div className="absolute -right-20 top-0 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-48 w-48 rounded-full bg-amber-300/20 blur-3xl" />
+      <section className="relative overflow-hidden rounded-[2rem] border border-amber-200/35 bg-[linear-gradient(135deg,#16120d_0%,#2a1c11_28%,#8a6431_78%,#f6ead6_140%)] p-6 text-white shadow-[0_35px_120px_-50px_rgba(84,56,21,0.7)] sm:p-8">
+        <div className="absolute -right-20 top-0 h-56 w-56 rounded-full bg-amber-50/15 blur-3xl" />
+        <div className="absolute bottom-0 left-0 h-48 w-48 rounded-full bg-amber-300/25 blur-3xl" />
         <div className="relative grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-white/90 backdrop-blur-md">
-              <ShieldCheck className="h-4 w-4 text-amber-300" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-amber-200/30 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-amber-50/95 backdrop-blur-md">
+              <ShieldCheck className="h-4 w-4 text-[#f4deb1]" />
               Admin command center
             </div>
-            <h1 className="mt-5 text-3xl font-black tracking-tight sm:text-4xl">A cleaner, sharper control room for platform operations.</h1>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-100 sm:text-base">
+            <h1 className="mt-5 text-3xl font-black tracking-tight text-[#f8e7bf] sm:text-4xl">A cleaner, sharper control room for platform operations.</h1>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-amber-50/85 sm:text-base">
               Track verified growth, review premium requests, and manage bookings with a more polished overview built for daily admin workflows.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-[1.5rem] border border-white/15 bg-white/10 p-5 backdrop-blur-md">
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-200">Live activity</p>
-              <p className="mt-3 text-3xl font-black">{stats?.totalBookings ?? 0}</p>
-              <p className="mt-2 text-sm text-slate-100">Bookings currently shaping platform momentum</p>
+            <div className="rounded-[1.5rem] border border-amber-200/25 bg-white/10 p-5 backdrop-blur-md">
+              <p className="text-xs uppercase tracking-[0.24em] text-amber-100/80">Live activity</p>
+              <p className="mt-3 text-3xl font-black text-[#f8e7bf]">{stats?.totalBookings ?? 0}</p>
+              <p className="mt-2 text-sm text-amber-50/82">Bookings currently shaping platform momentum</p>
             </div>
-            <div className="rounded-[1.5rem] border border-white/15 bg-white/10 p-5 backdrop-blur-md">
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-200">Premium requests</p>
-              <p className="mt-3 text-3xl font-black">{premiumRequests.filter((item) => item.status === "pending").length}</p>
-              <p className="mt-2 text-sm text-slate-100">Awaiting verification and approval</p>
+            <div className="rounded-[1.5rem] border border-[#f4deb1]/35 bg-[linear-gradient(180deg,rgba(255,248,235,0.18)_0%,rgba(244,222,177,0.12)_100%)] p-5 backdrop-blur-md">
+              <p className="text-xs uppercase tracking-[0.24em] text-[#f4deb1]">Premium requests</p>
+              <p className="mt-3 text-3xl font-black text-[#f8e7bf]">{premiumRequests.filter((item) => item.status === "pending").length}</p>
+              <p className="mt-2 text-sm text-amber-50/88">Awaiting verification and approval</p>
             </div>
           </div>
         </div>
@@ -330,9 +330,9 @@ export default function AdminDashboardPremium() {
             {premiumRequests.length} total requests
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[880px] text-left">
-            <thead className="bg-slate-50/80">
+        <div className="luxury-table-wrap">
+          <table className="luxury-table min-w-[880px]">
+            <thead>
               <tr>
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-[0.24em] text-slate-400">User</th>
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-[0.24em] text-slate-400">UTR</th>
@@ -342,9 +342,9 @@ export default function AdminDashboardPremium() {
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-[0.24em] text-slate-400">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               {premiumRequests.map((request) => (
-                <tr key={request.id} className="transition hover:bg-sky-50/40">
+                <tr key={request.id} className="luxury-table-row">
                   <td className="px-6 py-4">
                     <div className="font-semibold text-slate-950">{request.userName}</div>
                     <div className="text-sm text-slate-500">{request.userEmail}</div>
@@ -415,9 +415,9 @@ export default function AdminDashboardPremium() {
             {transactions.length} transactions
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[1120px] text-left">
-            <thead className="bg-slate-50/80">
+        <div className="luxury-table-wrap">
+          <table className="luxury-table min-w-[1120px]">
+            <thead>
               <tr>
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-[0.24em] text-slate-400">Room</th>
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-[0.24em] text-slate-400">Tenant</th>
@@ -430,9 +430,9 @@ export default function AdminDashboardPremium() {
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-[0.24em] text-slate-400">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               {transactions.slice(0, 10).map((tx) => (
-                <tr key={tx.id} className="transition hover:bg-sky-50/40">
+                <tr key={tx.id} className="luxury-table-row">
                   <td className="px-6 py-4 font-semibold text-slate-950">{tx.roomTitle}</td>
                   <td className="px-6 py-4 text-sm text-slate-600">{tx.userName}</td>
                   <td className="px-6 py-4 text-sm text-slate-600">{tx.ownerName}</td>
