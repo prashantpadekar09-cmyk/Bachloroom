@@ -46,14 +46,14 @@ const SidebarContent = ({
 }) => (
   <div className="flex h-full w-full flex-col">
     <div className="relative shrink-0 overflow-hidden p-6 sm:p-8">
-      <div className="absolute inset-x-4 top-4 h-24 rounded-[1.75rem] bg-[linear-gradient(135deg,rgba(37,99,235,0.16)_0%,rgba(14,165,233,0.1)_100%)] blur-2xl" />
+      <div className="absolute inset-x-4 top-4 h-24 rounded-[1.75rem] bg-[linear-gradient(135deg,rgba(138,100,49,0.2)_0%,rgba(246,231,207,0.12)_100%)] blur-2xl" />
       <div className="relative flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#2563eb_0%,#38bdf8_100%)] text-white shadow-lg shadow-sky-200/80">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#2b1c12_0%,#8a6431_100%)] text-[#f8e7bf] shadow-lg shadow-amber-900/20">
           <ShieldCheck className="h-6 w-6" />
         </div>
         <div>
           <span className="block text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">Control Panel</span>
-          <span className="font-black text-xl tracking-tight text-slate-950">Admin<span className="text-blue-600">Hub</span></span>
+          <span className="font-black text-xl tracking-tight text-slate-950">Admin<span className="text-[#b48845]">Hub</span></span>
         </div>
       </div>
     </div>
@@ -68,12 +68,12 @@ const SidebarContent = ({
             to={item.path}
             onClick={onNavigate}
             className={`group flex items-center justify-between rounded-2xl px-4 py-3.5 font-semibold transition-all duration-200 ${isActive
-                ? "bg-[linear-gradient(135deg,#2563eb_0%,#38bdf8_100%)] text-white shadow-[0_18px_45px_-24px_rgba(37,99,235,0.85)]"
+                ? "bg-[linear-gradient(135deg,#2b1c12_0%,#8a6431_100%)] text-[#f8e7bf] shadow-[0_18px_45px_-24px_rgba(84,56,21,0.6)]"
                 : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
               }`}
           >
             <div className="flex items-center">
-              <Icon className={`mr-3 h-5 w-5 transition-colors ${isActive ? "text-white" : "text-slate-400 group-hover:text-blue-600"}`} />
+              <Icon className={`mr-3 h-5 w-5 transition-colors ${isActive ? "text-[#f8e7bf]" : "text-slate-400 group-hover:text-[#b48845]"}`} />
               {item.name}
             </div>
             <div className="flex items-center gap-2">
@@ -240,9 +240,9 @@ export default function AdminLayout() {
             </Link>
             <div className="hidden flex-col items-end sm:flex">
               <span className="text-sm font-bold text-slate-950">{user?.name}</span>
-              <span className="rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">Administrator</span>
+              <span className="rounded-md bg-amber-50 px-2 py-0.5 text-xs font-medium text-[#b48845]">Administrator</span>
             </div>
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(135deg,#2563eb_0%,#38bdf8_100%)] text-base font-bold text-white shadow-md sm:h-11 sm:w-11">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(135deg,#2b1c12_0%,#8a6431_100%)] text-base font-bold text-[#f8e7bf] shadow-md sm:h-11 sm:w-11">
               {user?.name?.[0]?.toUpperCase() || "A"}
             </div>
           </div>

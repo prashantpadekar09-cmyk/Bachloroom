@@ -38,8 +38,8 @@ type DashboardToastProps = {
 
 const accentStyles = {
   blue: {
-    iconWrap: "bg-blue-100 text-blue-700",
-    pill: "bg-blue-50 text-blue-700 border-blue-100",
+    iconWrap: "bg-amber-100 text-[#b48845]",
+    pill: "bg-amber-50 text-[#b48845] border-amber-100",
   },
   emerald: {
     iconWrap: "bg-emerald-100 text-emerald-700",
@@ -129,7 +129,7 @@ export function DashboardStatCard({
   icon: Icon,
   label,
   value,
-  accent = "blue",
+  accent = "amber",
   hint,
 }: DashboardStatCardProps) {
   const styles = accentStyles[accent];
@@ -156,7 +156,7 @@ export function DashboardToast({ message, type = "info" }: DashboardToastProps) 
       ? "bg-emerald-600"
       : type === "error"
         ? "bg-rose-600"
-        : "bg-blue-600";
+        : "bg-[#8a6431]";
 
   return (
     <div className={`fixed right-4 top-4 z-50 rounded-2xl px-5 py-3 text-sm font-semibold text-white shadow-2xl ${palette}`}>

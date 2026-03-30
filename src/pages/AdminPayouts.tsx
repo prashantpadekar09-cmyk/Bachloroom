@@ -114,9 +114,11 @@ export default function AdminPayouts() {
                       <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
                         {payout.ownerName[0]}
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <p className="font-bold text-gray-900">{payout.ownerName}</p>
-                        <p className="text-xs text-gray-400 font-medium">ID: {payout.id.slice(0, 8)}...</p>
+                        <div className="mt-1 max-w-[15rem] overflow-x-auto whitespace-nowrap rounded-lg bg-slate-100 px-2 py-1 text-xs font-mono font-medium text-slate-500">
+                          ID: {payout.id}
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -124,9 +126,11 @@ export default function AdminPayouts() {
                     <p className="text-lg font-black text-gray-900">₹{payout.amount}</p>
                   </td>
                   <td className="px-8 py-6">
-                    <p className="inline-block break-all rounded-lg bg-blue-50 px-2 py-1 text-sm font-mono font-bold text-blue-600">
+                    <div className="max-w-[14rem] overflow-x-auto">
+                      <p className="inline-block whitespace-nowrap rounded-lg bg-blue-50 px-2 py-1 text-sm font-mono font-bold text-blue-600">
                       {getDisplayUpi(payout.upiId) || "N/A"}
-                    </p>
+                      </p>
+                    </div>
                   </td>
                   <td className="px-8 py-6">
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold ${
