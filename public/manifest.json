@@ -1,0 +1,17 @@
+{
+  "name": "BachelorRooms",
+  "short_name": "BachelorRooms",
+  "description": "Find your perfect bachelor room in India.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#16120d",
+  "theme_color": "#16120d",
+  "icons": [
+    {
+      "src": "/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

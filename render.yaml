@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: bacloroom
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm rebuild better-sqlite3 && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        value: e06f81b7bef7471da72cabe1cf937471e7aef26737794844bfe0b1cc5f9c1a93d26ce8b9c1ca4777bd6eca9a41fba963
+      - key: GEMINI_API_KEY
+        value: AIzaSyAwRdt-er95XQqp23GaiyHHt-fwJYAfreY
+      - key: RAZORPAY_KEY_ID
+        value: ""
+      - key: RAZORPAY_KEY_SECRET
+        value: ""
+      - key: GOOGLE_CLIENT_ID
+        value: 193601576014-67vs333g79ttdm2b2dg3sbrhvpc8g8b8.apps.googleusercontent.com
+      - key: VITE_GOOGLE_CLIENT_ID
+        value: 193601576014-67vs333g79ttdm2b2dg3sbrhvpc8g8b8.apps.googleusercontent.com
+      - key: TURSO_DATABASE_URL
+        value: libsql://bachloroom-prashantpadekar09-cmyk.aws-ap-south-1.turso.io
+      - key: TURSO_AUTH_TOKEN
+        value: eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NzQ2NzQ0NDEsImlkIjoiMDE5ZDMwMGQtYzQwMS03NTU4LTg1ZjUtYzQyZjI2Y2Y4YzViIiwicmlkIjoiMWUyOTE4NmEtZDNjMy00OTNlLWIxMzUtOTZiMjI5MjAwZTg4In0.dB__qZ03yGZbX9Fkk9xF1nIh60Geqi3eCPkofX0bTUGdnM9Ou4xBm-wqzuqAKxzGHIOrg_RiZ9Q_r9qgCzOWDA
