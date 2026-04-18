@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: bacloroom
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        value: e06f81b7bef7471da72cabe1cf937471e7aef26737794844bfe0b1cc5f9c1a93d26ce8b9c1ca4777bd6eca9a41fba963
+      - key: GEMINI_API_KEY
+        value: AIzaSyAwRdt-er95XQqp23GaiyHHt-fwJYAfreY
+      - key: RAZORPAY_KEY_ID
+        value: ""
+      - key: RAZORPAY_KEY_SECRET
+        value: ""
+      - key: GOOGLE_CLIENT_ID
+        value: 193601576014-67vs333g79ttdm2b2dg3sbrhvpc8g8b8.apps.googleusercontent.com
+      - key: VITE_GOOGLE_CLIENT_ID
+        value: 193601576014-67vs333g79ttdm2b2dg3sbrhvpc8g8b8.apps.googleusercontent.com
+      - key: SUPABASE_DB_URL
+        value: ""
+      - key: SUPABASE_DB_SSL
+        value: "true"
