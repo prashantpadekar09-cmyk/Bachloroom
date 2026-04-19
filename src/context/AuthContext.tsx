@@ -15,6 +15,7 @@ type User = {
   referredById?: string | null;
   referralBalance?: number;
   referralEarnings?: number;
+  credits?: number;
 };
 
 type AuthContextType = {
@@ -23,6 +24,7 @@ type AuthContextType = {
   login: (token: string, user: User) => void;
   logout: () => void;
   updateUser: (user: Partial<User>) => void;
+  refreshUser: () => Promise<void>;
   loading: boolean;
 };
 
@@ -84,8 +86,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser((prev) => prev ? { ...prev, ...updatedFields } : null);
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    if (!token) return;
+    try {
+      const res = await fetch("/api/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+      }
+    } catch (err) {
+      console.error("Failed to refresh user", err);
+    }
+  }, [token]);
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, updateUser, loading }}>
+    <AuthContext.Provider value={{ user, token, login, logout, updateUser, refreshUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

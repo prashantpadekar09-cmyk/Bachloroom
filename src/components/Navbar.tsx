@@ -9,6 +9,7 @@ import {
   Menu,
   Sparkles,
   User,
+  Wallet,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import BrandLogo from "./BrandLogo";
@@ -129,6 +130,13 @@ export default function Navbar() {
             {user ? (
               <>
                 <Link
+                  to="/dashboard?tab=wallet"
+                  className="inline-flex items-center gap-2 rounded-full border border-amber-100 bg-amber-50 px-3 py-1.5 text-sm font-bold text-amber-700 transition hover:bg-amber-100"
+                >
+                  <Wallet className="h-4 w-4" />
+                  {user.credits || 0}
+                </Link>
+                <Link
                   to={dashboardPath}
                   className="inline-flex items-center gap-2 rounded-full border border-sky-100 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-sky-200 hover:text-sky-700"
                 >
@@ -181,10 +189,17 @@ export default function Navbar() {
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-100 text-sky-700">
                     <User className="h-5 w-5" />
                   </div>
-                  <div className="min-w-0">
+                  <div className="flex-1 min-w-0">
                     <p className="truncate text-sm font-semibold text-slate-950">{user.name}</p>
                     <p className="text-xs capitalize text-slate-500">{user.role}</p>
                   </div>
+                  <Link 
+                    to="/dashboard?tab=wallet" 
+                    className="flex flex-col items-center gap-1 rounded-2xl bg-amber-50 px-3 py-2 text-amber-700 border border-amber-100 active:scale-95 transition"
+                  >
+                    <Wallet className="h-4 w-4" />
+                    <span className="text-xs font-black">{user.credits || 0}</span>
+                  </Link>
                 </div>
               </div>
             )}

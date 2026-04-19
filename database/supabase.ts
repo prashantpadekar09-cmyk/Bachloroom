@@ -32,4 +32,3 @@ export async function closeSupabasePool() {
   supabasePool = null;
   await pool.end();
 }
-

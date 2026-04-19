@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BedDouble, Crown, HandCoins, Loader2, ShieldCheck, Users, X } from "lucide-react";
+import { BedDouble, CreditCard, Crown, HandCoins, Loader2, ShieldCheck, Users, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { readJson } from "../utils/http";
 
@@ -8,6 +8,7 @@ type DashboardStats = {
   totalRooms?: number;
   totalPremiumUsers?: number;
   pendingVerifications?: number;
+  pendingCreditPayments?: number;
 };
 
 type PremiumRequest = {
@@ -18,6 +19,18 @@ type PremiumRequest = {
   amount?: number;
   screenshot?: string | null;
   status?: "pending" | "approved" | "rejected";
+};
+
+type CreditRequest = {
+  id: string;
+  userName?: string;
+  userEmail?: string;
+  packageId?: string;
+  amount?: number;
+  utrNumber?: string;
+  screenshot?: string | null;
+  status?: "pending" | "approved" | "rejected";
+  createdAt?: string;
 };
 
 type ReferralWithdrawal = {
@@ -50,15 +63,17 @@ export default function AdminDashboardPremium() {
   const { token } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [premiumRequests, setPremiumRequests] = useState<PremiumRequest[]>([]);
+  const [creditRequests, setCreditRequests] = useState<CreditRequest[]>([]);
   const [referralWithdrawals, setReferralWithdrawals] = useState<ReferralWithdrawal[]>([]);
   const [loading, setLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const fetchDashboardData = async () => {
     try {
-      const [statsRes, premiumRes, withdrawalsRes] = await Promise.all([
+      const [statsRes, premiumRes, creditRes, withdrawalsRes] = await Promise.all([
         fetch("/api/admin/stats", { headers: { Authorization: `Bearer ${token}` } }),
         fetch("/api/payments/admin/premium-requests", { headers: { Authorization: `Bearer ${token}` } }),
+        fetch("/api/payments/admin/manual-credit-requests", { headers: { Authorization: `Bearer ${token}` } }),
         fetch("/api/admin/referral-withdrawals", { headers: { Authorization: `Bearer ${token}` } }),
       ]);
 
@@ -69,6 +84,11 @@ export default function AdminDashboardPremium() {
       if (premiumRes.ok) {
         const data = await readJson<any>(premiumRes);
         setPremiumRequests(data.requests || []);
+      }
+
+      if (creditRes.ok) {
+        const data = await readJson<any>(creditRes);
+        setCreditRequests(data.requests || []);
       }
 
       if (withdrawalsRes.ok) {
@@ -105,6 +125,25 @@ export default function AdminDashboardPremium() {
       }
     } catch (err) {
       console.error("Failed to update premium request", err);
+    }
+  };
+
+  const handleCreditRequestUpdate = async (id: string, status: "approved" | "rejected") => {
+    try {
+      const res = await fetch(`/api/payments/admin/manual-credit-requests/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status }),
+      });
+
+      if (res.ok) {
+        await fetchDashboardData();
+      }
+    } catch (err) {
+      console.error("Failed to update credit request", err);
     }
   };
 
@@ -155,6 +194,13 @@ export default function AdminDashboardPremium() {
       icon: ShieldCheck,
       meta: "Profiles waiting for admin review",
       iconWrap: "bg-indigo-100 text-indigo-700",
+    },
+    {
+      name: "Pending Credits",
+      value: stats?.pendingCreditPayments ?? 0,
+      icon: CreditCard,
+      meta: "Manual payments waiting for approval",
+      iconWrap: "bg-rose-100 text-rose-700",
     },
   ];
 
@@ -315,6 +361,87 @@ export default function AdminDashboardPremium() {
                   </td>
                 </tr>
               ) : null}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="overflow-hidden rounded-[2rem] border border-white/70 bg-white/90 shadow-[0_30px_90px_-55px_rgba(15,23,42,0.28)] backdrop-blur-xl">
+        <div className="flex flex-col gap-3 border-b border-slate-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-xl font-black text-slate-950">Manual Credit Requests</h2>
+            <p className="mt-1 text-sm text-slate-500">Approve manual UPI payments for credit packages.</p>
+          </div>
+          <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600">
+            <CreditCard className="h-4 w-4" />
+            {creditRequests.length} credit requests
+          </div>
+        </div>
+        <div className="luxury-table-wrap">
+          <table className="luxury-table min-w-[880px]">
+            <thead>
+              <tr>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-[0.24em] text-slate-400">User</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-[0.24em] text-slate-400">Package</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-[0.24em] text-slate-400">Amount</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-[0.24em] text-slate-400">UTR / Proof</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-[0.24em] text-slate-400">Status</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-[0.24em] text-slate-400">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {creditRequests.map((request) => (
+                <tr key={request.id} className="luxury-table-row">
+                  <td className="px-6 py-4">
+                    <div className="font-semibold text-slate-950">{request.userName}</div>
+                    <div className="text-sm text-slate-500">{request.userEmail}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="font-bold text-blue-600 uppercase tracking-tight text-xs">{request.packageId?.replace('_', ' ')}</span>
+                  </td>
+                  <td className="px-6 py-4 font-bold text-slate-950">{formatCurrency(request.amount)}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs font-mono text-slate-500">{request.utrNumber}</span>
+                      {request.screenshot && (
+                        <button onClick={() => setPreviewImage(request.screenshot ?? null)} className="text-xs font-bold text-sky-600 hover:underline">
+                          View Screenshot
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex rounded-full px-3 py-1.5 text-xs font-bold capitalize ${statusStyles[request.status ?? "pending"]}`}>
+                      {request.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    {request.status === "pending" ? (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleCreditRequestUpdate(request.id, "approved")}
+                          className="rounded-xl bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-100"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleCreditRequestUpdate(request.id, "rejected")}
+                          className="rounded-xl bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 transition hover:bg-rose-100"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-xs font-medium text-slate-400">Processed</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {creditRequests.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center font-medium text-slate-400"> No manual credit requests found. </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

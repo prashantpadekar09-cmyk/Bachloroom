@@ -19,13 +19,15 @@ CREATE TABLE IF NOT EXISTS "users" (
   "createdAt" timestamptz DEFAULT now(),
   "isVerified" boolean DEFAULT false,
   "idDocument" text,
-  "googleId" text
+  "googleId" text,
+  "credits" integer DEFAULT 0
 );
 
 ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "referralCode" text;
 ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "referredById" text;
 ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "referralBalance" integer DEFAULT 0;
 ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "referralEarnings" integer DEFAULT 0;
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "credits" integer DEFAULT 0;
 
 CREATE TABLE IF NOT EXISTS "rooms" (
   "id" text PRIMARY KEY,
@@ -153,6 +155,25 @@ CREATE TABLE IF NOT EXISTS "referral_withdrawals" (
   "createdAt" timestamptz DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS "room_unlocks" (
+  "id" text PRIMARY KEY,
+  "userId" text NOT NULL REFERENCES "users"("id"),
+  "roomId" text NOT NULL REFERENCES "rooms"("id"),
+  "ownerId" text NOT NULL REFERENCES "users"("id"),
+  "status" text DEFAULT 'unlocked',
+  "createdAt" timestamptz DEFAULT now(),
+  UNIQUE ("userId", "roomId")
+);
+
+CREATE TABLE IF NOT EXISTS "credit_transactions" (
+  "id" text PRIMARY KEY,
+  "userId" text NOT NULL REFERENCES "users"("id"),
+  "amount" integer NOT NULL,
+  "type" text NOT NULL,
+  "description" text,
+  "createdAt" timestamptz DEFAULT now()
+);
+
 CREATE INDEX IF NOT EXISTS idx_rooms_city ON "rooms"("city");
 CREATE INDEX IF NOT EXISTS idx_rooms_location ON "rooms"("location");
 CREATE INDEX IF NOT EXISTS idx_rooms_price ON "rooms"("price");
@@ -164,4 +185,18 @@ CREATE INDEX IF NOT EXISTS idx_referral_transactions_referrer ON "referral_trans
 CREATE INDEX IF NOT EXISTS idx_referral_transactions_referee ON "referral_transactions"("refereeId");
 CREATE INDEX IF NOT EXISTS idx_referral_withdrawals_user ON "referral_withdrawals"("userId");
 CREATE INDEX IF NOT EXISTS idx_referral_withdrawals_status ON "referral_withdrawals"("status");
+
+CREATE TABLE IF NOT EXISTS "manual_credit_payments" (
+  "id" text PRIMARY KEY,
+  "userId" text NOT NULL REFERENCES "users"("id"),
+  "packageId" text NOT NULL,
+  "amount" numeric NOT NULL,
+  "utrNumber" text NOT NULL,
+  "screenshot" text,
+  "status" text DEFAULT 'pending',
+  "reviewedBy" text REFERENCES "users"("id"),
+  "reviewedAt" timestamptz,
+  "createdAt" timestamptz DEFAULT now(),
+  UNIQUE ("utrNumber")
+);
 

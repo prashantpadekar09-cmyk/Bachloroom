@@ -451,7 +451,7 @@ export default function OwnerDashboard() {
                           const readers = files.map((file) => new Promise<string>((resolve) => {
                             const reader = new FileReader();
                             reader.onloadend = () => resolve(reader.result as string);
-                            reader.readAsDataURL(file);
+                            reader.readAsDataURL(file as File);
                           }));
                           Promise.all(readers).then((results) => {
                             setNewRoom((current) => ({

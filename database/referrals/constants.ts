@@ -6,4 +6,3 @@ export const REFERRAL_REWARD_OWNER_LIST_RUPEES = 15;
 export type AwardResult =
   | { awarded: true; amount: number; referrerId: string }
   | { awarded: false; reason: "no-referrer" | "already-awarded" | "invalid-referrer" };
-

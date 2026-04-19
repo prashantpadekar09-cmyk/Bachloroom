@@ -14,6 +14,12 @@ import {
   ShieldCheck,
   Trash2,
   User,
+  Wallet,
+  ArrowRightLeft,
+  Clock,
+  ExternalLink,
+  Plus,
+  Minus,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -24,13 +30,14 @@ import {
   DashboardSurface,
 } from "../components/dashboard/DashboardTheme";
 import ReferralCard from "../components/referrals/ReferralCard";
+import CreditPurchaseModal from "../components/CreditPurchaseModal";
 
-type Tab = "profile" | "premium" | "saved" | "messages" | "settings";
+type Tab = "profile" | "wallet" | "saved" | "messages" | "settings";
 
-const validTabs: Tab[] = ["profile", "premium", "saved", "messages", "settings"];
+const validTabs: Tab[] = ["profile", "wallet", "saved", "messages", "settings"];
 
 export default function UserDashboard() {
-  const { user, token, logout, updateUser } = useAuth();
+  const { user, token, logout, updateUser, refreshUser } = useAuth();
   const location = useLocation();
   const requestedTab = new URLSearchParams(location.search).get("tab");
   const initialTab = validTabs.includes(requestedTab as Tab) ? (requestedTab as Tab) : "profile";
@@ -40,11 +47,14 @@ export default function UserDashboard() {
   const [loading, setLoading] = useState(true);
   const [isPremium, setIsPremium] = useState(Boolean(user?.isPremium));
   const [premiumPayment, setPremiumPayment] = useState<any>(null);
+  const [creditPayment, setCreditPayment] = useState<any>(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [supportQueryText, setSupportQueryText] = useState("");
   const [supportMessage, setSupportMessage] = useState("");
   const [supportSubmitting, setSupportSubmitting] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [walletHistory, setWalletHistory] = useState<any[]>([]);
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const [profileForm, setProfileForm] = useState({
     name: user?.name || "",
     phone: user?.phone || "",
@@ -66,12 +76,16 @@ export default function UserDashboard() {
   }, [user]);
 
   useEffect(() => {
+    // Refresh user context immediately on mount to get latest credits
+    refreshUser();
+
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [savedRes, premiumStatusRes] = await Promise.all([
+        const [savedRes, premiumStatusRes, creditStatusRes] = await Promise.all([
           fetch("/api/saved-rooms", { headers: { Authorization: `Bearer ${token}` } }),
           fetch("/api/payments/premium/status", { headers: { Authorization: `Bearer ${token}` } }),
+          fetch("/api/payments/manual-credits/status", { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
         if (savedRes.ok) {
@@ -83,10 +97,17 @@ export default function UserDashboard() {
           const data = await premiumStatusRes.json();
           setIsPremium(Boolean(data.isPremium));
           setPremiumPayment(data.payment || null);
-          updateUser({
-            isPremium: Boolean(data.isPremium),
-            subscriptionPlan: data.isPremium ? "premium" : user?.subscriptionPlan,
-          });
+        }
+
+        if (creditStatusRes.ok) {
+          const data = await creditStatusRes.json();
+          setCreditPayment(data.payment || null);
+        }
+
+        const historyRes = await fetch("/api/users/wallet/history", { headers: { Authorization: `Bearer ${token}` } });
+        if (historyRes.ok) {
+          const data = await historyRes.json();
+          setWalletHistory(data.history || []);
         }
       } catch (err) {
         console.error("Failed to fetch dashboard data", err);
@@ -99,6 +120,31 @@ export default function UserDashboard() {
       fetchData();
     }
   }, [token, updateUser, user?.subscriptionPlan]);
+
+  const refreshDashboardData = async () => {
+    try {
+      setLoading(true);
+      const [historyRes, _] = await Promise.all([
+        fetch("/api/users/wallet/history", { headers: { Authorization: `Bearer ${token}` } }),
+        refreshUser(),
+        // Also re-fetch current status
+        fetch("/api/payments/premium/status", { headers: { Authorization: `Bearer ${token}` } }),
+        fetch("/api/payments/manual-credits/status", { headers: { Authorization: `Bearer ${token}` } }),
+      ]);
+
+      if (historyRes.ok) {
+        const data = await historyRes.json();
+        setWalletHistory(data.history || []);
+      }
+      
+      // We also need to re-scan for the specific payment states if necessary,
+      // but refreshUser() handles the global 'user' fields.
+    } catch (err) {
+      console.error("Failed to refresh dashboard data", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!token) {
@@ -232,7 +278,7 @@ export default function UserDashboard() {
 
   const tabs = [
     { id: "profile", label: "Profile", icon: User },
-    { id: "premium", label: "Premium", icon: Crown },
+    { id: "wallet", label: "Wallet", icon: Wallet },
     { id: "saved", label: "Saved", icon: Heart },
     { id: "messages", label: "Support", icon: MessageSquare },
     { id: "settings", label: "Settings", icon: SettingsIcon },
@@ -247,11 +293,11 @@ export default function UserDashboard() {
       hint: savedRooms.length ? "Your shortlist is ready for quick comparison." : "Save rooms to compare them later.",
     },
     {
-      icon: Crown,
-      label: "Premium",
-      value: isPremium ? "Active" : "Free",
+      icon: Wallet,
+      label: "Wallet",
+      value: `${user?.credits || 0} Credits`,
       accent: "amber" as const,
-      hint: isPremium ? "Owner contact details are unlocked on room pages." : "Upgrade to unlock owner contact details.",
+      hint: user?.credits ? "You have credits available to unlock room contacts." : "Refill your credits to unlock room contacts.",
     },
     {
       icon: ShieldCheck,
@@ -313,6 +359,25 @@ export default function UserDashboard() {
         <DashboardSurface>
           <ReferralCard />
         </DashboardSurface>
+
+        {premiumPayment && premiumPayment.status === 'pending' && (
+          <DashboardSurface className="p-6 border-amber-200 bg-amber-50/30">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-amber-100 text-amber-700 rounded-2xl animate-pulse">
+                <Crown className="h-6 w-6" />
+              </div>
+              <div className="flex-grow">
+                <h3 className="font-bold text-gray-900">Premium Upgrade Pending</h3>
+                <p className="text-sm text-gray-600">
+                  Your premium membership request (₹{premiumPayment.amount}) is under review. UTR: {premiumPayment.utrNumber}.
+                </p>
+              </div>
+              <div className="px-4 py-1.5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold uppercase tracking-wider">
+                Pending Review
+              </div>
+            </div>
+          </DashboardSurface>
+        )}
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
           <div className="flex-shrink-0 lg:w-64">
@@ -403,49 +468,98 @@ export default function UserDashboard() {
               </DashboardSurface>
             ) : null}
 
-            {activeTab === "premium" ? (
-              <DashboardSurface className="overflow-hidden bg-[linear-gradient(135deg,#fff7ed_0%,#fffbeb_100%)] p-8">
-                <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-                  <div className="max-w-2xl">
-                    <div className="inline-flex items-center rounded-full bg-gray-900 px-4 py-1.5 text-sm font-semibold text-white">
-                      <Crown className="mr-2 h-4 w-4 text-amber-300" />
-                      Premium access
+            {activeTab === "wallet" ? (
+              <div className="space-y-6">
+                <DashboardSurface className="overflow-hidden bg-[linear-gradient(135deg,#fff7ed_0%,#fffbeb_100%)] p-8">
+                  <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                    <div className="max-w-2xl">
+                      <div className="inline-flex items-center rounded-full bg-gray-900 px-4 py-1.5 text-sm font-semibold text-white">
+                        <Wallet className="mr-2 h-4 w-4 text-amber-300" />
+                        Wallet Balance
+                      </div>
+                      <h2 className="mt-5 text-3xl font-black text-gray-900">{user?.credits || 0} Credits</h2>
+                      <p className="mt-3 text-sm leading-7 text-gray-600">
+                        Use credits to unlock direct contact details of room owners. 1 unlock costs 1 credit.
+                      </p>
                     </div>
-                    <h2 className="mt-5 text-3xl font-black text-gray-900">Unlock owner details for Rs. 99</h2>
-                    <p className="mt-3 text-sm leading-7 text-gray-600">
-                      Premium unlocks direct owner phone and email details on room pages after your manual payment is approved.
-                    </p>
+                    <button 
+                      onClick={() => setIsPurchaseModalOpen(true)}
+                      className="rounded-3xl bg-blue-600 px-8 py-4 font-black text-white shadow-lg shadow-blue-100 transition hover:bg-blue-700 hover:-translate-y-1 active:scale-95 flex items-center gap-2"
+                    >
+                      <Plus className="h-5 w-5" />
+                      Add Credits
+                    </button>
                   </div>
-                  <div className="rounded-3xl border border-white bg-white/90 p-6 shadow-sm">
-                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-gray-400">Status</p>
-                    <p className="mt-3 text-3xl font-black text-gray-900">{isPremium ? "Active" : premiumPayment?.status === "pending" ? "Pending" : "Free"}</p>
-                    <p className="mt-2 text-sm text-gray-500">
-                      {isPremium
-                        ? "Premium is active. Owner phone numbers and direct contact are unlocked."
-                        : premiumPayment?.status === "pending"
-                          ? "Your payment proof is waiting for admin approval."
-                          : "Upgrade to premium to unlock direct owner contact details."}
-                    </p>
+                  <div className="mt-8 grid gap-4 md:grid-cols-3">
+                    <div className="rounded-2xl border border-white bg-white/90 p-5 shadow-sm">
+                      <p className="text-xs font-bold uppercase tracking-[0.22em] text-gray-400">Total Unlocks</p>
+                      <p className="mt-2 text-2xl font-black text-gray-900">{walletHistory.filter(h => h.type === 'unlock').length}</p>
+                    </div>
+                    <div className="rounded-2xl border border-white bg-white/90 p-5 shadow-sm">
+                      <p className="text-xs font-bold uppercase tracking-[0.22em] text-gray-400">Plan</p>
+                      <p className="mt-2 text-2xl font-black text-gray-900 capitalize">{user?.subscriptionPlan || 'Basic'}</p>
+                    </div>
+                    <div className="rounded-2xl border border-white bg-white/90 p-5 shadow-sm">
+                      <p className="text-xs font-bold uppercase tracking-[0.22em] text-gray-400">Premium Status</p>
+                      <p className="mt-2 text-2xl font-black text-gray-900">{user?.isPremium ? 'Active' : 'Free'}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="mt-8 grid gap-4 md:grid-cols-3">
-                  <div className="rounded-2xl border border-white bg-white/90 p-5 shadow-sm">
-                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-gray-400">Unlock Amount</p>
-                    <p className="mt-2 text-2xl font-black text-gray-900">Rs. 99</p>
+                </DashboardSurface>
+
+                {creditPayment && creditPayment.status === 'pending' && (
+                  <DashboardSurface className="p-6 border-amber-200 bg-amber-50/30">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-amber-100 text-amber-700 rounded-2xl animate-pulse">
+                        <Clock className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-900">Credit Purchase Pending</h3>
+                        <p className="text-sm text-gray-600">
+                          Your payment of ₹{creditPayment.amount} for {creditPayment.packageId.replace('_', ' ')} is under review (UTR: {creditPayment.utrNumber}).
+                        </p>
+                      </div>
+                    </div>
+                  </DashboardSurface>
+                )}
+
+                <DashboardSurface className="p-8">
+                  <div className="flex items-center justify-between mb-8">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">Transaction History</h3>
+                      <p className="text-sm text-gray-500">Track your credit purchases and usage.</p>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-2xl">
+                      <Clock className="h-6 w-6 text-slate-400" />
+                    </div>
                   </div>
-                  <div className="rounded-2xl border border-white bg-white/90 p-5 shadow-sm">
-                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-gray-400">Current Access</p>
-                    <p className="mt-2 text-2xl font-black text-gray-900">{isPremium ? "Unlocked" : "Locked"}</p>
-                  </div>
-                  <div className="rounded-2xl border border-white bg-white/90 p-5 shadow-sm">
-                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-gray-400">Last UTR</p>
-                    <p className="mt-2 truncate text-lg font-bold text-gray-900">{premiumPayment?.utrNumber || "---"}</p>
-                  </div>
-                </div>
-                <Link to="/premium-payment" className="mt-8 inline-flex rounded-xl bg-amber-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-amber-700">
-                  {isPremium ? "View Premium Access" : "Upgrade to Premium"}
-                </Link>
-              </DashboardSurface>
+
+                  {walletHistory.length === 0 ? (
+                    <div className="py-12 text-center">
+                      <ArrowRightLeft className="mx-auto h-12 w-12 text-slate-100 mb-4" />
+                      <p className="text-slate-400 font-medium">No transactions yet.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {walletHistory.map((item) => (
+                        <div key={item.id} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-slate-50/50 transition">
+                          <div className="flex items-center gap-4">
+                            <div className={`p-3 rounded-xl ${item.amount > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-600'}`}>
+                              {item.amount > 0 ? <Plus className="h-5 w-5" /> : <Minus className="h-5 w-5" />}
+                            </div>
+                            <div>
+                              <p className="font-bold text-gray-900">{item.description}</p>
+                              <p className="text-xs text-gray-500">{new Date(item.createdAt).toLocaleString()}</p>
+                            </div>
+                          </div>
+                          <div className={`text-lg font-black ${item.amount > 0 ? 'text-emerald-600' : 'text-slate-900'}`}>
+                            {item.amount > 0 ? '+' : ''}{item.amount}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </DashboardSurface>
+              </div>
             ) : null}
 
             {activeTab === "saved" ? (
@@ -602,6 +716,11 @@ export default function UserDashboard() {
           </div>
         </div>
       </div>
+      <CreditPurchaseModal 
+        isOpen={isPurchaseModalOpen} 
+        onClose={() => setIsPurchaseModalOpen(false)} 
+        onSuccess={refreshDashboardData}
+      />
     </DashboardShell>
   );
 }

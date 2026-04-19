@@ -18,6 +18,9 @@ import {
 import { GoogleGenAI } from "@google/genai";
 import { useAuth } from "../context/AuthContext";
 import ReviewSystem from "../components/ReviewSystem";
+import CreditPurchaseModal from "../components/CreditPurchaseModal";
+import RoomUnlockModal from "../components/RoomUnlockModal";
+import UnlockedContactModal from "../components/UnlockedContactModal";
 
 const normalizeRoomImages = (images: unknown) => {
   if (!Array.isArray(images)) {
@@ -61,6 +64,11 @@ export default function RoomDetail() {
   const [showGallery, setShowGallery] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const gallerySectionRef = useRef<HTMLDivElement | null>(null);
+
+  const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [unlockedPhone, setUnlockedPhone] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchRoom = async () => {
@@ -203,7 +211,19 @@ Is this price 'Fair', 'Overpriced', or a 'Good Deal'? Respond with ONLY ONE of t
       return;
     }
 
-    navigate(`/premium-payment?redirect=${encodeURIComponent(`/rooms/${id}`)}`);
+    if (contactUnlocked) {
+      setIsContactModalOpen(true);
+    } else {
+      setIsUnlockModalOpen(true);
+    }
+  };
+
+  const onUnlockSuccess = (phone: string) => {
+    setUnlockedPhone(phone);
+    setOwner({ ...owner, phone });
+    setContactUnlocked(true);
+    setIsUnlockModalOpen(false);
+    setIsContactModalOpen(true);
   };
 
   if (loading) {
@@ -429,25 +449,28 @@ Is this price 'Fair', 'Overpriced', or a 'Good Deal'? Respond with ONLY ONE of t
                           Contact details
                         </div>
                         <p className="mt-2 text-sm leading-relaxed text-amber-700">
-                          Upgrade to premium for Rs. 99 to view the owner's phone number and email details.
+                          Unlock direct contact with owner using 1 credit.
                         </p>
                         <button
                           onClick={handleUnlockOwnerDetails}
                           className="mt-4 inline-flex rounded-xl bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-700"
                         >
-                          Unlock Owner Details
+                          Unlock Details
                         </button>
                       </div>
                     ) : null}
                     {contactUnlocked && owner.phone ? (
-                      <div className="mt-4 w-full rounded-2xl border border-emerald-100 bg-emerald-50 p-4 text-left">
+                      <button
+                        onClick={() => setIsContactModalOpen(true)}
+                        className="mt-4 w-full rounded-2xl border border-emerald-100 bg-emerald-50 p-4 text-left transition hover:bg-emerald-100"
+                      >
                         <div className="flex items-center text-sm font-semibold text-emerald-800">
                           <Phone className="mr-2 h-4 w-4" />
                           Contact details unlocked
                         </div>
                         <p className="mt-2 text-sm text-emerald-700">Phone: {owner.phone}</p>
-                        {owner.email ? <p className="mt-1 text-sm text-emerald-700">Email: {owner.email}</p> : null}
-                      </div>
+                        <p className="mt-1 text-xs text-emerald-600 font-bold">Click to view full profile & WhatsApp</p>
+                      </button>
                     ) : null}
                   </div>
 
@@ -550,20 +573,21 @@ Is this price 'Fair', 'Overpriced', or a 'Good Deal'? Respond with ONLY ONE of t
                   </div>
 
                   {contactUnlocked && owner ? (
-                    <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
-                      <div className="mb-2 flex items-center text-sm font-semibold text-emerald-800">
-                        <Phone className="mr-2 h-4 w-4" />
-                        Owner contact unlocked
-                      </div>
-                      <p className="text-sm text-emerald-700">Phone: {owner.phone || "Not available"}</p>
-                      {owner.email ? <p className="mt-1 text-sm text-emerald-700">Email: {owner.email}</p> : null}
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsContactModalOpen(true)}
+                      className="w-full rounded-2xl bg-emerald-600 py-4 font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-lg flex items-center justify-center gap-2"
+                    >
+                      <Phone className="h-5 w-5" />
+                      View Owner Contact
+                    </button>
                   ) : (
                     <button
                       type="button"
                       onClick={handleUnlockOwnerDetails}
-                      className="w-full rounded-2xl bg-amber-600 py-4 font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-amber-700 hover:shadow-lg"
+                      className="w-full rounded-2xl bg-amber-600 py-4 font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-amber-700 hover:shadow-lg flex items-center justify-center gap-2"
                     >
+                      <Lock className="h-5 w-5" />
                       Unlock Owner Details
                     </button>
                   )}
@@ -573,6 +597,27 @@ Is this price 'Fair', 'Overpriced', or a 'Good Deal'? Respond with ONLY ONE of t
           </div>
         </div>
       </div>
+      <CreditPurchaseModal 
+        isOpen={isPurchaseModalOpen} 
+        onClose={() => setIsPurchaseModalOpen(false)} 
+      />
+
+      <RoomUnlockModal
+        isOpen={isUnlockModalOpen}
+        onClose={() => setIsUnlockModalOpen(false)}
+        room={room}
+        owner={owner}
+        onUnlockSuccess={onUnlockSuccess}
+        onBuyCredits={() => setIsPurchaseModalOpen(true)}
+      />
+
+      <UnlockedContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        room={room}
+        owner={owner}
+        phone={owner?.phone || unlockedPhone || ""}
+      />
     </div>
   );
 }

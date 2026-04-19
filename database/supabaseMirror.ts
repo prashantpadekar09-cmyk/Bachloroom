@@ -13,12 +13,8 @@ function quoteIdent(identifier: string) {
 }
 
 function normalizeSqliteValue(value: unknown) {
-  if (value instanceof Date) {
-    return value.toISOString();
-  }
-  if (typeof value === "boolean") {
-    return Number(value);
-  }
+  if (value instanceof Date) return value.toISOString();
+  if (typeof value === "boolean") return Number(value);
   return value;
 }
 
@@ -37,7 +33,6 @@ function normalizePostgresValue(table: TableName, column: string, value: unknown
     if (typeof value === "string") return value === "1" || value.toLowerCase() === "true";
     return Boolean(value);
   }
-
   return value;
 }
 
@@ -52,33 +47,23 @@ function getLocalCount(table: TableName) {
 }
 
 function getMeaningfulLocalUserCount() {
-  const row = db
-    .prepare(
-      `
-        SELECT COUNT(*) as count
-        FROM users
-        WHERE role != 'admin'
-          AND email != 'services.curated@bachelorrooms.local'
-          AND id NOT LIKE 'demo-%'
-          AND id NOT LIKE 'showcase-%'
-          AND email NOT LIKE 'demo.%@example.com'
-      `
-    )
-    .get() as { count?: number };
+  const row = db.prepare(`
+    SELECT COUNT(*) as count FROM users
+    WHERE role != 'admin'
+      AND email != 'services.curated@bachelorrooms.local'
+      AND id NOT LIKE 'demo-%'
+      AND id NOT LIKE 'showcase-%'
+      AND email NOT LIKE 'demo.%@example.com'
+  `).get() as { count?: number };
   return row?.count ?? 0;
 }
 
 function getMeaningfulLocalRoomCount() {
-  const row = db
-    .prepare(
-      `
-        SELECT COUNT(*) as count
-        FROM rooms
-        WHERE id NOT LIKE 'demo-%'
-          AND id NOT LIKE 'showcase-room-%'
-      `
-    )
-    .get() as { count?: number };
+  const row = db.prepare(`
+    SELECT COUNT(*) as count FROM rooms
+    WHERE id NOT LIKE 'demo-%'
+      AND id NOT LIKE 'showcase-room-%'
+  `).get() as { count?: number };
   return row?.count ?? 0;
 }
 
@@ -91,8 +76,7 @@ async function getRemoteCount(table: TableName) {
 async function getMeaningfulRemoteUserCount() {
   const pool = getSupabasePool();
   const result = await pool.query<{ count: string }>(`
-    SELECT COUNT(*)::text as count
-    FROM users
+    SELECT COUNT(*)::text as count FROM users
     WHERE role != 'admin'
       AND email != 'services.curated@bachelorrooms.local'
       AND id NOT LIKE 'demo-%'
@@ -105,10 +89,8 @@ async function getMeaningfulRemoteUserCount() {
 async function getMeaningfulRemoteRoomCount() {
   const pool = getSupabasePool();
   const result = await pool.query<{ count: string }>(`
-    SELECT COUNT(*)::text as count
-    FROM rooms
-    WHERE id NOT LIKE 'demo-%'
-      AND id NOT LIKE 'showcase-room-%'
+    SELECT COUNT(*)::text as count FROM rooms
+    WHERE id NOT LIKE 'demo-%' AND id NOT LIKE 'showcase-room-%'
   `);
   return Number(result.rows[0]?.count ?? 0);
 }
@@ -125,18 +107,6 @@ async function ensureRemoteSchema() {
   }
 }
 
-async function clearRemote() {
-  const pool = getSupabasePool();
-  const client = await pool.connect();
-  try {
-    for (const table of [...supabaseTableOrder].reverse()) {
-      await client.query(`DELETE FROM ${quoteIdent(table)}`);
-    }
-  } finally {
-    client.release();
-  }
-}
-
 async function clearLocal() {
   for (const table of [...supabaseTableOrder].reverse()) {
     db.prepare(`DELETE FROM ${table}`).run();
@@ -145,7 +115,6 @@ async function clearLocal() {
 
 export async function pushLocalToSupabase() {
   await ensureRemoteSchema();
-
   const pool = getSupabasePool();
   const client = await pool.connect();
   try {
@@ -153,27 +122,21 @@ export async function pushLocalToSupabase() {
     for (const table of [...supabaseTableOrder].reverse()) {
       await client.query(`DELETE FROM ${quoteIdent(table)}`);
     }
-
     for (const table of supabaseTableOrder) {
       const columns = getColumns(table);
       const rows = db.prepare(`SELECT * FROM ${table}`).all() as Record<string, unknown>[];
       if (rows.length === 0) continue;
-
       const quotedColumns = columns.map(quoteIdent).join(", ");
-      const placeholders = columns.map((_, index) => `$${index + 1}`).join(", ");
+      const placeholders = columns.map((_, i) => `$${i + 1}`).join(", ");
       const insertSql = `INSERT INTO ${quoteIdent(table)} (${quotedColumns}) VALUES (${placeholders})`;
-
       for (const row of rows) {
-        const values = columns.map((column) => normalizePostgresValue(table, column, row[column] ?? null));
+        const values = columns.map((col) => normalizePostgresValue(table, col, row[col] ?? null));
         await client.query(insertSql, values);
       }
     }
-
     await client.query("COMMIT");
   } catch (error) {
-    try {
-      await client.query("ROLLBACK");
-    } catch {}
+    try { await client.query("ROLLBACK"); } catch {}
     throw error;
   } finally {
     client.release();
@@ -182,28 +145,22 @@ export async function pushLocalToSupabase() {
 
 async function pullSupabaseToLocal() {
   await ensureRemoteSchema();
-
   const pool = getSupabasePool();
   const client = await pool.connect();
-
   db.exec("BEGIN");
   try {
     await clearLocal();
-
     for (const table of supabaseTableOrder) {
       const columns = getColumns(table);
       const result = await client.query<Record<string, unknown>>(`SELECT * FROM ${quoteIdent(table)}`);
       if (result.rows.length === 0) continue;
-
       const sql = `INSERT INTO ${table} (${columns.join(", ")}) VALUES (${columns.map(() => "?").join(", ")})`;
       const insert = db.prepare(sql);
-
       for (const row of result.rows) {
-        const values = columns.map((column) => normalizeSqliteValue(row[column] === undefined ? null : row[column]));
+        const values = columns.map((col) => normalizeSqliteValue(row[col] === undefined ? null : row[col]));
         insert.run(...values);
       }
     }
-
     db.exec("COMMIT");
   } catch (error) {
     db.exec("ROLLBACK");
@@ -248,29 +205,20 @@ export async function initSupabaseMirror() {
 }
 
 export function scheduleSupabaseSync(reason = "manual") {
-  if (!mirrorEnabled || !hasSupabaseDbConfig()) {
-    return;
-  }
-
-  if (syncTimer) {
-    clearTimeout(syncTimer);
-  }
-
+  if (!mirrorEnabled || !hasSupabaseDbConfig()) return;
+  if (syncTimer) clearTimeout(syncTimer);
   syncTimer = setTimeout(() => {
     syncTimer = null;
     const run = async () => {
       try {
         await pushLocalToSupabase();
-        console.log(`[supabase] synced local SQLite to remote (${reason})`);
+        console.log(`[supabase] synced (${reason})`);
       } catch (error) {
         console.error("[supabase] sync failed:", error);
       }
     };
-
-    syncInFlight = run().finally(() => {
-      syncInFlight = null;
-    });
-  }, 1200);
+    syncInFlight = run().finally(() => { syncInFlight = null; });
+  }, 1500);
 }
 
 export async function flushSupabaseSync() {
@@ -286,4 +234,3 @@ export async function flushSupabaseSync() {
 export function isSupabaseMirrorEnabled() {
   return mirrorEnabled;
 }
-

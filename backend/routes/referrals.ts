@@ -1,15 +1,13 @@
 import express from "express";
 import { authenticateToken } from "../middleware/auth.js";
-import { createReferralWithdrawalRequest, getMyReferralSummary } from "../db/referrals/index.js";
-import { scheduleSupabaseSync } from "../db/supabaseMirror.js";
+import { createReferralWithdrawalRequest, getMyReferralSummary } from "../../database/referrals/index.js";
+import { scheduleSupabaseSync } from "../../database/supabaseMirror.js";
 
 const router = express.Router();
 
 router.get("/me", authenticateToken, (req: any, res) => {
   const summary = getMyReferralSummary(req.user.id);
-  if (!summary) {
-    return res.status(404).json({ error: "User not found" });
-  }
+  if (!summary) return res.status(404).json({ error: "User not found" });
 
   const appUrl =
     (process.env.APP_URL && process.env.APP_URL.trim()) ||
@@ -25,19 +23,12 @@ router.get("/me", authenticateToken, (req: any, res) => {
 router.post("/withdraw", authenticateToken, (req: any, res: any) => {
   const rawAmount = req.body?.amount;
   const rawUpiId = req.body?.upiId;
-
-  const amount = typeof rawAmount === "string" ? Number(rawAmount) : Number(rawAmount);
+  const amount = Number(rawAmount);
   const upiId = typeof rawUpiId === "string" ? rawUpiId.trim() : "";
 
-  if (!Number.isFinite(amount) || amount <= 0) {
-    return res.status(400).json({ error: "Enter a valid withdrawal amount" });
-  }
-  if (amount < 10) {
-    return res.status(400).json({ error: "Minimum withdrawal is ₹10" });
-  }
-  if (!upiId || upiId.length < 5 || !upiId.includes("@")) {
-    return res.status(400).json({ error: "Enter a valid UPI ID" });
-  }
+  if (!Number.isFinite(amount) || amount <= 0) return res.status(400).json({ error: "Enter a valid withdrawal amount" });
+  if (amount < 10) return res.status(400).json({ error: "Minimum withdrawal is ₹10" });
+  if (!upiId || upiId.length < 5 || !upiId.includes("@")) return res.status(400).json({ error: "Enter a valid UPI ID" });
 
   try {
     const created = createReferralWithdrawalRequest({ userId: req.user.id, amount: Math.floor(amount), upiId });

@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { db } from "../db/setup.js";
+import { db } from "../../database/setup.js";
 
 export const JWT_SECRET =
   process.env.JWT_SECRET ?? (() => {
@@ -19,9 +19,7 @@ export const authenticateToken = (req: any, res: any, next: any) => {
       .prepare("SELECT id, role, email, name FROM users WHERE id = ?")
       .get(decoded.id) as { id: string; role: string; email: string; name: string } | undefined;
 
-    if (!currentUser) {
-      return res.status(401).json({ error: "Invalid token" });
-    }
+    if (!currentUser) return res.status(401).json({ error: "Invalid token" });
 
     req.user = {
       ...decoded,
@@ -31,7 +29,7 @@ export const authenticateToken = (req: any, res: any, next: any) => {
       name: currentUser.name,
     };
     next();
-  } catch (err) {
+  } catch (_) {
     res.status(401).json({ error: "Invalid token" });
   }
 };
