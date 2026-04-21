@@ -1,6 +1,8 @@
 -- Supabase schema (single-file migration)
 -- This file is intentionally idempotent (uses IF NOT EXISTS / ADD COLUMN IF NOT EXISTS)
 
+DROP TABLE IF EXISTS "premium_payments" CASCADE;
+
 CREATE TABLE IF NOT EXISTS "users" (
   "id" text PRIMARY KEY,
   "name" text NOT NULL,

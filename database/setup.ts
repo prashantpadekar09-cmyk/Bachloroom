@@ -95,6 +95,8 @@ function cleanupDemoData() {
 }
 
 export function setupDb() {
+  try { db.exec("DROP TABLE IF EXISTS premium_payments;"); } catch (_) {}
+
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
