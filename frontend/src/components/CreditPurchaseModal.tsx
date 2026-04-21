@@ -48,7 +48,6 @@ export default function CreditPurchaseModal({ isOpen, onClose, onSuccess }: Cred
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [selectedPkg, setSelectedPkg] = useState<CreditPackage | null>(null);
-  const [paymentMode, setPaymentMode] = useState<"selection" | "razorpay" | "manual">("selection");
   const [manualForm, setManualForm] = useState({ utrNumber: "", screenshot: "" });
 
   if (!isOpen) return null;
@@ -105,89 +104,6 @@ export default function CreditPurchaseModal({ isOpen, onClose, onSuccess }: Cred
 
   const handlePurchase = async (pkg: CreditPackage) => {
     setSelectedPkg(pkg);
-    setPaymentMode("razorpay"); // Default to razorpay logic but we can change this based on UI
-    // To keep it simple, we'll let the user choose in the next screen
-  };
-
-  const executeRazorpay = async (pkgId: string) => {
-    if (!token) return;
-    setLoading(true);
-    setError("");
-
-    try {
-      const res = await fetch("/api/payments/create-order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ packageId: pkgId }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to create order");
-
-      const options = {
-        key: data.key_id,
-        amount: data.order.amount,
-        currency: "INR",
-        name: "Bachloroom",
-        description: `Purchase ${pkgId} Credits`,
-        order_id: data.order.id,
-        handler: async (response: any) => {
-          try {
-            const verifyRes = await fetch("/api/payments/verify", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({
-                ...response,
-                packageId: pkgId,
-              }),
-            });
-
-            const verifyData = await verifyRes.json();
-            if (verifyRes.ok) {
-              const currentCredits = user?.credits || 0;
-              const pkg = PACKAGES.find(p => p.id === pkgId);
-              if (pkg) {
-                updateUser({ 
-                  credits: currentCredits + pkg.credits,
-                  isPremium: pkgId !== "credits_5" ? true : user?.isPremium,
-                  subscriptionPlan: pkgId === "unlimited" ? "unlimited" : user?.subscriptionPlan
-                });
-              }
-              onSuccess?.();
-              onClose();
-            } else {
-              setError(verifyData.error || "Payment verification failed");
-            }
-          } catch (err) {
-            setError("Something went wrong during verification");
-          }
-          setLoading(false);
-        },
-        prefill: {
-          name: user?.name,
-          email: user?.email,
-          contact: user?.phone,
-        },
-        theme: {
-          color: "#8a6431",
-        },
-        modal: {
-          ondismiss: () => setLoading(false),
-        },
-      };
-
-      const rzp = new (window as any).Razorpay(options);
-      rzp.open();
-    } catch (err: any) {
-      setError(err.message);
-      setLoading(false);
-    }
   };
 
   return (
@@ -266,62 +182,9 @@ export default function CreditPurchaseModal({ isOpen, onClose, onSuccess }: Cred
                     </ul>
                   </div>
 
-                  <div className="p-4 rounded-3xl border border-slate-100 bg-white">
-                    <p className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4 text-center">Select Payment Mode</p>
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        onClick={() => setPaymentMode("razorpay")}
-                        className={`py-3 rounded-2xl text-sm font-bold flex flex-col items-center gap-1 transition-all ${
-                          paymentMode === 'razorpay' 
-                            ? 'bg-[linear-gradient(135deg,#2b1c12_0%,#8a6431_100%)] text-[#f8e7bf] shadow-lg shadow-amber-900/10' 
-                            : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
-                        }`}
-                      >
-                        <CreditCard className="h-4 w-4" />
-                        Automatic
-                      </button>
-                      <button
-                        onClick={() => setPaymentMode("manual")}
-                        className={`py-3 rounded-2xl text-sm font-bold flex flex-col items-center gap-1 transition-all ${
-                          paymentMode === 'manual' 
-                            ? 'bg-amber-500 text-white shadow-lg shadow-amber-100' 
-                            : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
-                        }`}
-                      >
-                        <QrCode className="h-4 w-4" />
-                        Scan QR
-                      </button>
-                    </div>
-                  </div>
                 </div>
 
                 <div className="min-h-[400px]">
-                  {paymentMode === 'razorpay' ? (
-                    <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-slate-50 rounded-[2.5rem] border border-slate-100">
-                      <div className="p-6 rounded-full bg-amber-50 text-[#8a6431] mb-6 border border-amber-100">
-                        <Shield className="h-12 w-12" />
-                      </div>
-                      <h3 className="text-2xl font-black text-gray-900 mb-4">Secure Auto Checkout</h3>
-                      <p className="text-gray-500 mb-8 max-w-sm">
-                        Instantly add credits to your account using UPI, Cards, or Netbanking via Razorpay securely.
-                      </p>
-                      <button
-                        onClick={() => executeRazorpay(selectedPkg.id)}
-                        disabled={loading}
-                        className="w-full max-w-xs py-5 rounded-[2rem] bg-[linear-gradient(135deg,#2b1c12_0%,#8a6431_100%)] text-[#f8e7bf] font-black text-lg shadow-xl shadow-amber-900/20 hover:brightness-110 transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
-                      >
-                        {loading ? (
-                          <div className="h-6 w-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        ) : (
-                          <>
-                            Pay ₹{selectedPkg.price} Now
-                            <Sparkles className="h-5 w-5" />
-                          </>
-                        )}
-                      </button>
-                      <p className="mt-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Powered by Razorpay</p>
-                    </div>
-                  ) : (
                     <div className="h-full space-y-6">
                       <h3 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
                         <QrCode className="h-5 w-5 text-amber-500" />
@@ -399,7 +262,6 @@ export default function CreditPurchaseModal({ isOpen, onClose, onSuccess }: Cred
                         </div>
                       </div>
                     </div>
-                  )}
                 </div>
               </div>
             </div>
