@@ -15,7 +15,7 @@ View your app in AI Studio: https://ai.studio/apps/56c06695-2992-4336-8e33-df7f3
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+2. Set the `GEMINI_API_KEY` in [`.env`](.env) to your Gemini API key
 3. Run the app:
    `npm run dev`
 
@@ -30,7 +30,7 @@ As of March 26, 2026, Render still offers a free web service tier. This repo is 
    `GEMINI_API_KEY`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `GOOGLE_CLIENT_ID`, `VITE_GOOGLE_CLIENT_ID`
 
 Important:
-- The app uses SQLite in `data/database.sqlite`.
+- The app uses SQLite in `database/data/database.sqlite`.
 - On Render free web services, the filesystem is ephemeral, so SQLite data can reset after redeploys/restarts.
 - For persistent production data, move the database to an external service.
 

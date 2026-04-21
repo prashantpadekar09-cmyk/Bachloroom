@@ -27,7 +27,7 @@ router.post("/withdraw", authenticateToken, (req: any, res: any) => {
   const upiId = typeof rawUpiId === "string" ? rawUpiId.trim() : "";
 
   if (!Number.isFinite(amount) || amount <= 0) return res.status(400).json({ error: "Enter a valid withdrawal amount" });
-  if (amount < 10) return res.status(400).json({ error: "Minimum withdrawal is ₹10" });
+  if (amount < 299) return res.status(400).json({ error: "Minimum withdrawal is ₹299" });
   if (!upiId || upiId.length < 5 || !upiId.includes("@")) return res.status(400).json({ error: "Enter a valid UPI ID" });
 
   try {

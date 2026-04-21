@@ -23,7 +23,6 @@ export const supabaseTableOrder = [
   "messages",
   "services",
   "saved_rooms",
-  "premium_payments",
   "manual_credit_payments",
   "support_queries",
   "support_query_messages",

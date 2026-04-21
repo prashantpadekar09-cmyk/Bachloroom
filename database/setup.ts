@@ -8,8 +8,8 @@ import { openSqliteDatabase } from "./sqlite.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Data directory is at project root /data or custom DATA_DIR for Render Disk
-const dbDir = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : path.resolve(__dirname, "../data");
+// Data directory is at database/data or custom DATA_DIR for Render Disk
+const dbDir = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : path.resolve(__dirname, "./data");
 if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
@@ -68,7 +68,6 @@ function cleanupDemoData() {
 
   if (demoUserIds.length > 0) {
     const ph = demoUserIds.map(() => "?").join(", ");
-    db.prepare(`DELETE FROM premium_payments WHERE userId IN (${ph}) OR reviewedBy IN (${ph})`).run(...demoUserIds, ...demoUserIds);
     db.prepare(`DELETE FROM support_query_messages WHERE senderId IN (${ph})`).run(...demoUserIds);
     db.prepare(`DELETE FROM support_queries WHERE userId IN (${ph})`).run(...demoUserIds);
     db.prepare(`DELETE FROM referral_transactions WHERE referrerId IN (${ph}) OR refereeId IN (${ph})`).run(...demoUserIds, ...demoUserIds);
@@ -193,20 +192,7 @@ export function setupDb() {
       UNIQUE(userId, roomId)
     );
 
-    CREATE TABLE IF NOT EXISTS premium_payments (
-      id TEXT PRIMARY KEY,
-      userId TEXT NOT NULL,
-      amount REAL NOT NULL DEFAULT 99,
-      utrNumber TEXT NOT NULL,
-      screenshot TEXT,
-      status TEXT DEFAULT 'pending',
-      reviewedBy TEXT,
-      reviewedAt DATETIME,
-      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY(userId) REFERENCES users(id),
-      FOREIGN KEY(reviewedBy) REFERENCES users(id),
-      UNIQUE(userId, utrNumber)
-    );
+
 
     CREATE TABLE IF NOT EXISTS manual_credit_payments (
       id TEXT PRIMARY KEY,

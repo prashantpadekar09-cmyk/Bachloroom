@@ -70,7 +70,7 @@ function buildAuthResponse(user: any) {
       referredById: user.referredById,
       referralBalance: Number(user.referralBalance ?? 0), // BUG FIX: was missing
       referralEarnings: Number(user.referralEarnings ?? 0),
-      credits: Number(user.credits ?? 0),
+      credits: Math.floor(Number(user.credits ?? 0)),
     },
   };
 }
@@ -145,7 +145,8 @@ router.post("/register", async (req, res) => {
     }));
   } catch (err: any) {
     if (err.code === "SQLITE_CONSTRAINT_UNIQUE") return res.status(400).json({ error: "Email already exists" });
-    res.status(500).json({ error: "Internal server error" });
+    console.error("[REGISTER ERROR]", err?.message || err);
+    res.status(500).json({ error: err?.message || "Internal server error" });
   }
 });
 
@@ -242,7 +243,8 @@ router.post("/google", async (req, res) => {
     const message = err?.message || "";
     const knownErrors = new Set(["Google authentication is not configured", "Missing Google credential", "Invalid Google credential", "Google client mismatch", "Google account email is not verified"]);
     if (knownErrors.has(message)) return res.status(400).json({ error: message });
-    return res.status(500).json({ error: "Google authentication failed" });
+    console.error("[GOOGLE AUTH ERROR]", err?.message || err);
+    return res.status(500).json({ error: message || "Google authentication failed" });
   }
 });
 
@@ -254,9 +256,18 @@ router.get("/me", (req, res) => {
     const decoded = jwt.verify(token, JWT_SECRET) as any;
     const user = db.prepare(
       "SELECT id, name, email, phone, role, subscriptionPlan, isPremium, isVerified, idDocument, aadhaarNumber, selfieImage, referralCode, referredById, referralBalance, referralEarnings, credits FROM users WHERE id = ?"
-    ).get(decoded.id);
+    ).get(decoded.id) as any;
     if (!user) return res.status(404).json({ error: "User not found" });
-    res.json({ user });
+    res.json({
+      user: {
+        ...user,
+        credits: Math.floor(Number(user.credits ?? 0)),
+        referralBalance: Number(user.referralBalance ?? 0),
+        referralEarnings: Number(user.referralEarnings ?? 0),
+        isPremium: Boolean(user.isPremium),
+        isVerified: Boolean(user.isVerified),
+      },
+    });
   } catch (_) {
     res.status(401).json({ error: "Invalid token" });
   }

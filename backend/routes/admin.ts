@@ -13,10 +13,9 @@ const adminOnly = (req: any, res: any, next: any) => {
 
 router.get("/stats", authenticateToken, adminOnly, (req: any, res: any) => {
   try {
-    const [userCount, roomCount, premiumCount, pendingVerificationCount, pendingCreditsCount] = [
+    const [userCount, roomCount, pendingVerificationCount, pendingCreditsCount] = [
       db.prepare("SELECT COUNT(*) as count FROM users").get() as any,
       db.prepare("SELECT COUNT(*) as count FROM rooms").get() as any,
-      db.prepare("SELECT COUNT(*) as count FROM users WHERE isPremium = 1").get() as any,
       db.prepare(`
         SELECT COUNT(*) as count FROM users
         WHERE (isVerified=0 OR isVerified IS NULL)
@@ -26,7 +25,7 @@ router.get("/stats", authenticateToken, adminOnly, (req: any, res: any) => {
     ];
     res.json({
       totalUsers: userCount.count, totalRooms: roomCount.count,
-      totalPremiumUsers: premiumCount.count, pendingVerifications: pendingVerificationCount.count,
+      pendingVerifications: pendingVerificationCount.count,
       pendingCreditPayments: pendingCreditsCount.count,
     });
   } catch (e) { console.error(e); res.status(500).json({ error: "Internal server error" }); }
@@ -94,7 +93,6 @@ router.delete("/users/:id", authenticateToken, adminOnly, (req: any, res: any) =
 
     db.transaction((userId: string) => {
       const roomIds = (db.prepare("SELECT id FROM rooms WHERE ownerId=?").all(userId) as { id: string }[]).map((r) => r.id);
-      db.prepare("DELETE FROM premium_payments WHERE userId=? OR reviewedBy=?").run(userId, userId);
       db.prepare("DELETE FROM referral_transactions WHERE referrerId=? OR refereeId=?").run(userId, userId);
       db.prepare("DELETE FROM referral_withdrawals WHERE userId=? OR reviewedBy=?").run(userId, userId);
       db.prepare("DELETE FROM saved_rooms WHERE userId=?").run(userId);
@@ -103,18 +101,32 @@ router.delete("/users/:id", authenticateToken, adminOnly, (req: any, res: any) =
       db.prepare("DELETE FROM services WHERE providerId=?").run(userId);
       db.prepare("DELETE FROM support_query_messages WHERE senderId=? OR queryId IN (SELECT id FROM support_queries WHERE userId=?)").run(userId, userId);
       db.prepare("DELETE FROM support_queries WHERE userId=?").run(userId);
+      
+      // New credit system tables
+      db.prepare("DELETE FROM credit_transactions WHERE userId=?").run(userId);
+      db.prepare("DELETE FROM room_unlocks WHERE userId=? OR ownerId=?").run(userId, userId);
+      db.prepare("DELETE FROM manual_credit_payments WHERE userId=? OR reviewedBy=?").run(userId, userId);
+      
+      // Legacy table cleanup
+      try { db.prepare("DELETE FROM premium_payments WHERE userId=? OR reviewedBy=?").run(userId, userId); } catch (_) {}
+
       if (roomIds.length > 0) {
         const ph = roomIds.map(() => "?").join(",");
         db.prepare(`DELETE FROM saved_rooms WHERE roomId IN (${ph})`).run(...roomIds);
         db.prepare(`DELETE FROM messages WHERE roomId IN (${ph})`).run(...roomIds);
         db.prepare(`DELETE FROM reviews WHERE roomId IN (${ph})`).run(...roomIds);
+        db.prepare(`DELETE FROM room_unlocks WHERE roomId IN (${ph})`).run(...roomIds);
         db.prepare(`DELETE FROM rooms WHERE id IN (${ph})`).run(...roomIds);
       }
       db.prepare("DELETE FROM users WHERE id=? AND role!='admin'").run(userId);
     })(req.params.id);
 
+    scheduleSupabaseSync("user delete");
     res.json({ message: "User deleted successfully" });
-  } catch (e) { console.error(e); res.status(500).json({ error: "Internal server error" }); }
+  } catch (e: any) { 
+    console.error("[DELETE USER ERROR]", e); 
+    res.status(500).json({ error: e?.message || "Internal server error" }); 
+  }
 });
 
 router.patch("/users/:id/role", authenticateToken, adminOnly, (req: any, res: any) => {

@@ -36,7 +36,8 @@ const safeParseArray = (value: any) => {
 };
 
 router.get("/", (req, res) => {
-  const { city, location, minPrice, maxPrice, type, minLat, maxLat, minLng, maxLng } = req.query;
+  const { city, location, minPrice, maxPrice, type, minLat, maxLat, minLng, maxLng, sort } = req.query;
+  const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
   let query = "SELECT * FROM rooms WHERE 1=1";
   const params: any[] = [];
 
@@ -45,11 +46,24 @@ router.get("/", (req, res) => {
   if (minPrice) { query += " AND price >= ?"; params.push(minPrice); }
   if (maxPrice) { query += " AND price <= ?"; params.push(maxPrice); }
   if (type) { query += " AND type = ?"; params.push(type); }
+  if (q) {
+    query += " AND (title LIKE ? OR description LIKE ? OR location LIKE ? OR city LIKE ?)";
+    const like = `%${q}%`;
+    params.push(like, like, like, like);
+  }
   if (minLat && maxLat && minLng && maxLng) {
     query += " AND lat >= ? AND lat <= ? AND lng >= ? AND lng <= ?";
     params.push(minLat, maxLat, minLng, maxLng);
   }
-  query += " ORDER BY isFeatured DESC, createdAt DESC";
+
+  const sortKey = typeof sort === "string" ? sort : "";
+  if (sortKey === "price_asc") {
+    query += " ORDER BY isFeatured DESC, price ASC, createdAt DESC";
+  } else if (sortKey === "price_desc") {
+    query += " ORDER BY isFeatured DESC, price DESC, createdAt DESC";
+  } else {
+    query += " ORDER BY isFeatured DESC, createdAt DESC";
+  }
 
   try {
     const rooms = db.prepare(query).all(...params).map((r: any) => ({
@@ -104,21 +118,13 @@ router.get("/:id", (req, res) => {
     const contactUnlocked = Boolean(currentUser) && (
       currentUser.id === room.ownerId ||
       currentUser.role === "admin" ||
-      hasUnlockedContact ||
-      hasPremiumAccess(currentUser.id)
+      hasUnlockedContact
     );
 
     const partialPhone = ownerRecord ? ownerRecord.phone?.replace(/(\d{2})(\d{6})(\d{2})/, "$1XXXXXX$3") : "98XXXXXX12";
     const owner = ownerRecord
       ? { id: ownerRecord.id, name: ownerRecord.name, role: ownerRecord.role, email: contactUnlocked ? ownerRecord.email : null, phone: contactUnlocked ? ownerRecord.phone : partialPhone }
       : null;
-
-    if (currentUser && currentUser.role === "user" && currentUser.id !== room.ownerId && hasPremiumAccess(currentUser.id)) {
-      try {
-        const result = awardReferralReward({ refereeId: currentUser.id, type: "unlock_owner_contact", amount: REFERRAL_REWARD_USER_UNLOCK_RUPEES, roomId: room.id });
-        if (result.awarded) scheduleSupabaseSync("referral unlock_owner_contact");
-      } catch (e) { console.warn("Referral reward skipped:", e); }
-    }
 
     res.json({ room, owner, contactUnlocked, requiresPlatformPayment: !contactUnlocked });
   } catch (_) { res.status(500).json({ error: "Internal server error" }); }
@@ -131,7 +137,7 @@ router.post("/:id/unlock", authenticateToken, (req: any, res: any) => {
     const room = db.prepare("SELECT ownerId FROM rooms WHERE id = ?").get(roomId) as any;
     if (!room) return res.status(404).json({ error: "Room not found" });
 
-    if (room.ownerId === userId || req.user.role === "admin" || hasPremiumAccess(userId)) {
+    if (room.ownerId === userId || req.user.role === "admin") {
       return res.json({ message: "Contact already available", success: true });
     }
 
@@ -154,6 +160,14 @@ router.post("/:id/unlock", authenticateToken, (req: any, res: any) => {
     });
 
     const ownerPhone = unlockContact();
+    
+    if (req.user.role === "user") {
+      try {
+        const result = awardReferralReward({ refereeId: userId, type: "unlock_owner_contact", amount: REFERRAL_REWARD_USER_UNLOCK_RUPEES, roomId: room.id });
+        if (result.awarded) scheduleSupabaseSync("referral unlock_owner_contact");
+      } catch (e) { console.warn("Referral reward skipped:", e); }
+    }
+
     scheduleSupabaseSync("contact_unlock");
     res.json({ message: "Contact unlocked", success: true, phone: ownerPhone });
   } catch (e) {

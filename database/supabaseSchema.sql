@@ -100,18 +100,7 @@ CREATE TABLE IF NOT EXISTS "saved_rooms" (
   UNIQUE ("userId", "roomId")
 );
 
-CREATE TABLE IF NOT EXISTS "premium_payments" (
-  "id" text PRIMARY KEY,
-  "userId" text NOT NULL REFERENCES "users"("id"),
-  "amount" numeric NOT NULL DEFAULT 99,
-  "utrNumber" text NOT NULL,
-  "screenshot" text,
-  "status" text DEFAULT 'pending',
-  "reviewedBy" text REFERENCES "users"("id"),
-  "reviewedAt" timestamptz,
-  "createdAt" timestamptz DEFAULT now(),
-  UNIQUE ("userId", "utrNumber")
-);
+
 
 CREATE TABLE IF NOT EXISTS "support_queries" (
   "id" text PRIMARY KEY,

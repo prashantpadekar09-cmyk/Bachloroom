@@ -7,6 +7,17 @@ type TableName = (typeof supabaseTableOrder)[number];
 let mirrorEnabled = false;
 let syncTimer: NodeJS.Timeout | null = null;
 let syncInFlight: Promise<void> | null = null;
+let lastInitAt: string | null = null;
+let lastInitError: string | null = null;
+let lastSyncAt: string | null = null;
+let lastSyncError: string | null = null;
+let lastSyncReason: string | null = null;
+
+function normalizeErrorMessage(error: unknown) {
+  if (!error) return "Unknown error";
+  if (error instanceof Error) return error.message || "Error";
+  return String(error);
+}
 
 function quoteIdent(identifier: string) {
   return `"${identifier.replaceAll('"', '""')}"`;
@@ -173,35 +184,46 @@ async function pullSupabaseToLocal() {
 export async function initSupabaseMirror() {
   if (!hasSupabaseDbConfig()) {
     mirrorEnabled = false;
+    lastInitAt = new Date().toISOString();
+    lastInitError = "Missing SUPABASE_DB_URL";
     return { enabled: false as const };
   }
 
-  await ensureRemoteSchema();
+  lastInitAt = new Date().toISOString();
+  lastInitError = null;
 
-  const localUsers = getLocalCount("users");
-  const remoteUsers = await getRemoteCount("users");
-  const localMeaningfulUsers = getMeaningfulLocalUserCount();
-  const remoteMeaningfulUsers = await getMeaningfulRemoteUserCount();
-  const localMeaningfulRooms = getMeaningfulLocalRoomCount();
-  const remoteMeaningfulRooms = await getMeaningfulRemoteRoomCount();
+  try {
+    await ensureRemoteSchema();
 
-  if (
-    remoteMeaningfulUsers > localMeaningfulUsers ||
-    remoteMeaningfulRooms > localMeaningfulRooms ||
-    (localUsers === 0 && remoteUsers > 0)
-  ) {
-    await pullSupabaseToLocal();
-  } else if (
-    (localMeaningfulUsers > remoteMeaningfulUsers || localMeaningfulRooms > remoteMeaningfulRooms) &&
-    (localMeaningfulUsers > 0 || localMeaningfulRooms > 0)
-  ) {
-    await pushLocalToSupabase();
-  } else if (localUsers > 0 && remoteUsers === 0) {
-    await pushLocalToSupabase();
+    const localUsers = getLocalCount("users");
+    const remoteUsers = await getRemoteCount("users");
+    const localMeaningfulUsers = getMeaningfulLocalUserCount();
+    const remoteMeaningfulUsers = await getMeaningfulRemoteUserCount();
+    const localMeaningfulRooms = getMeaningfulLocalRoomCount();
+    const remoteMeaningfulRooms = await getMeaningfulRemoteRoomCount();
+
+    if (
+      remoteMeaningfulUsers > localMeaningfulUsers ||
+      remoteMeaningfulRooms > localMeaningfulRooms ||
+      (localUsers === 0 && remoteUsers > 0)
+    ) {
+      await pullSupabaseToLocal();
+    } else if (
+      (localMeaningfulUsers > remoteMeaningfulUsers || localMeaningfulRooms > remoteMeaningfulRooms) &&
+      (localMeaningfulUsers > 0 || localMeaningfulRooms > 0)
+    ) {
+      await pushLocalToSupabase();
+    } else if (localUsers > 0 && remoteUsers === 0) {
+      await pushLocalToSupabase();
+    }
+
+    mirrorEnabled = true;
+    return { enabled: true as const };
+  } catch (error) {
+    mirrorEnabled = false;
+    lastInitError = normalizeErrorMessage(error);
+    return { enabled: false as const, error: lastInitError };
   }
-
-  mirrorEnabled = true;
-  return { enabled: true as const };
 }
 
 export function scheduleSupabaseSync(reason = "manual") {
@@ -211,9 +233,13 @@ export function scheduleSupabaseSync(reason = "manual") {
     syncTimer = null;
     const run = async () => {
       try {
+        lastSyncReason = reason;
+        lastSyncError = null;
         await pushLocalToSupabase();
+        lastSyncAt = new Date().toISOString();
         console.log(`[supabase] synced (${reason})`);
       } catch (error) {
+        lastSyncError = normalizeErrorMessage(error);
         console.error("[supabase] sync failed:", error);
       }
     };
@@ -225,7 +251,10 @@ export async function flushSupabaseSync() {
   if (syncTimer) {
     clearTimeout(syncTimer);
     syncTimer = null;
+    lastSyncReason = "flush";
+    lastSyncError = null;
     await pushLocalToSupabase();
+    lastSyncAt = new Date().toISOString();
   } else if (syncInFlight) {
     await syncInFlight;
   }
@@ -233,4 +262,15 @@ export async function flushSupabaseSync() {
 
 export function isSupabaseMirrorEnabled() {
   return mirrorEnabled;
+}
+
+export function getSupabaseMirrorStatus() {
+  return {
+    enabled: mirrorEnabled,
+    lastInitAt,
+    lastInitError,
+    lastSyncAt,
+    lastSyncError,
+    lastSyncReason,
+  };
 }
