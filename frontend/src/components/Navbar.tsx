@@ -253,31 +253,29 @@ export default function Navbar() {
         )}
       </nav>
 
-      {!isMapRoute && (
-        <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] pt-3 shadow-[0_-20px_50px_-34px_rgba(36,25,15,0.2)] backdrop-blur-2xl lg:hidden">
-          <div className="mx-auto grid max-w-md grid-cols-4 gap-2">
-            {mobileBottomLinks.map((link) => {
-              const Icon = link.icon;
-              const active = isActive(link.path);
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] pt-3 shadow-[0_-20px_50px_-34px_rgba(36,25,15,0.2)] backdrop-blur-2xl lg:hidden">
+        <div className="mx-auto grid max-w-md grid-cols-4 gap-2">
+          {mobileBottomLinks.map((link) => {
+            const Icon = link.icon;
+            const active = isActive(link.path);
 
-              return (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-semibold transition ${
-                    active
-                      ? "bg-[linear-gradient(135deg,#2b1c12_0%,#8a6431_100%)] text-[#f8e7bf] shadow-lg shadow-amber-900/20"
-                      : "text-slate-600 hover:bg-amber-50 hover:text-[#8a6431]"
-                  }`}
-                >
-                  <Icon className="h-5 w-5" />
-                  <span>{link.name}</span>
-                </Link>
-              );
-            })}
-          </div>
-        </nav>
-      )}
+            return (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-semibold transition ${
+                  active
+                    ? "bg-[linear-gradient(135deg,#2b1c12_0%,#8a6431_100%)] text-[#f8e7bf] shadow-lg shadow-amber-900/20"
+                    : "text-slate-600 hover:bg-amber-50 hover:text-[#8a6431]"
+                }`}
+              >
+                <Icon className="h-5 w-5" />
+                <span>{link.name}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </>
   );
 }

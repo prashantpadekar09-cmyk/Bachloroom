@@ -76,9 +76,12 @@ export default function MapView() {
 
   const handleRecenter = useCallback(async () => {
     setSelectedRoomId(null);
+    if (userLocation) {
+      setMapCenter([userLocation.lat, userLocation.lng]);
+      setMapZoom(14);
+    }
     await refreshUserLocation();
-    setMapZoom(14);
-  }, [refreshUserLocation]);
+  }, [refreshUserLocation, userLocation]);
 
   const selectedRoom = useMemo(() => rooms.find((room) => room.id === selectedRoomId), [rooms, selectedRoomId]);
 
@@ -91,7 +94,7 @@ export default function MapView() {
   };
 
   return (
-    <div className="relative flex h-[calc(100dvh-76px)] w-full overflow-hidden bg-slate-50 sm:h-[calc(100dvh-84px)] lg:h-[calc(100vh-84px)] mt-[76px] sm:mt-[84px]">
+    <div className="relative flex h-[calc(100dvh-76px)] w-full overflow-hidden bg-slate-50 sm:h-[calc(100dvh-84px)] lg:h-[calc(100vh-84px)] mt-[76px] sm:mt-[84px] pb-[calc(env(safe-area-inset-bottom,0px)+80px)] lg:pb-0">
       <main className="relative flex-1 h-full">
         <MapComponent
           center={mapCenter}
@@ -110,7 +113,7 @@ export default function MapView() {
         {/* Action Buttons */}
         <button
           onClick={handleRecenter}
-          className="absolute bottom-10 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/70 bg-white/90 text-slate-700 shadow-2xl backdrop-blur-xl transition-all hover:bg-white hover:text-amber-600 active:scale-95"
+          className="absolute bottom-6 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/70 bg-white/90 text-slate-700 shadow-2xl backdrop-blur-xl transition-all hover:bg-white hover:text-amber-600 active:scale-95 lg:bottom-10"
           title="My Location"
         >
           {locationLoading ? (
@@ -126,7 +129,7 @@ export default function MapView() {
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
-              className="pointer-events-auto absolute bottom-8 left-1/2 z-40 w-[90%] -translate-x-1/2 max-w-lg md:left-8 md:translate-x-0"
+              className="pointer-events-auto absolute bottom-4 left-1/2 z-40 w-[95%] -translate-x-1/2 max-w-lg md:left-8 md:translate-x-0 lg:bottom-8"
             >
               <div className="group relative flex gap-3 overflow-hidden rounded-[2rem] border border-white/70 bg-white/95 p-3 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.25)] backdrop-blur-2xl md:p-4">
                 <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-[1.25rem] bg-slate-100 md:h-32 md:w-32">
