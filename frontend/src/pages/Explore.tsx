@@ -88,9 +88,9 @@ export default function Explore() {
       {/* Hero Section */}
       <section className="relative flex min-h-[56vh] items-center justify-center overflow-hidden bg-[#16120d] sm:min-h-[60vh]">
         <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=2000" 
-            alt="Hero Background" 
+          <img
+            src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=2000"
+            alt="Hero Background"
             className="w-full h-full object-cover opacity-60 scale-105"
             referrerPolicy="no-referrer"
           />
@@ -98,7 +98,7 @@ export default function Explore() {
         </div>
 
         <div className="relative z-10 w-full max-w-4xl px-4 text-center">
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -226,7 +226,7 @@ export default function Explore() {
                     <p className="mb-6 line-clamp-2 text-sm leading-relaxed text-[#5f4b3b]">
                       {room.description || "Experience premium living with all modern amenities included. Perfect for students and working professionals."}
                     </p>
-                    
+
                     <div className="mt-auto flex items-center justify-between border-t border-amber-100/70 pt-6">
                       <div className="flex -space-x-2">
                         {[1, 2, 3].map((i) => (
@@ -274,7 +274,7 @@ export default function Explore() {
         <div className="relative overflow-hidden rounded-[3rem] bg-[linear-gradient(135deg,#16120d_0%,#2b1c12_34%,#7c5a2c_100%)] p-8 text-center shadow-[0_40px_100px_-50px_rgba(52,34,16,0.85)] sm:p-12 md:p-20">
           <div className="absolute right-0 top-0 -mr-20 -mt-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
           <div className="absolute bottom-0 left-0 -mb-20 -ml-20 h-64 w-64 rounded-full bg-amber-200/10 blur-3xl"></div>
-          
+
           <div className="relative z-10">
             <h2 className="mb-6 text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
               Ready to find your next home?

@@ -95,9 +95,7 @@ export default function MapComponent({
       <BoundsHandler onBoundsChange={onBoundsChange} />
 
       {userLocation && (
-        <Marker position={userLocation} icon={UserLocationIcon}>
-          <Popup>Your Location</Popup>
-        </Marker>
+        <Marker position={userLocation} icon={UserLocationIcon} />
       )}
 
       {rooms.map((room) => {
@@ -109,17 +107,7 @@ export default function MapComponent({
             position={[room.lat, room.lng]}
             icon={createCustomIcon(room.id === selectedRoomId)}
             eventHandlers={{ click: () => onRoomClick(room.id) }}
-          >
-            <Popup offset={[0, -20]}>
-              <div className="p-1">
-                <p className="font-bold text-slate-900">{room.title}</p>
-                <p className="text-sm text-slate-600">
-                  {"\u20B9"}
-                  {room.price.toLocaleString()}/{room.billingPeriod}
-                </p>
-              </div>
-            </Popup>
-          </Marker>
+          />
         );
       })}
     </MapContainer>
