@@ -4,7 +4,7 @@ import compression from "compression";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
-import { setupDb } from "../database/setup.js";
+import { dbPath, setupDb } from "../database/setup.js";
 import { initSupabaseMirror, isSupabaseMirrorEnabled, scheduleSupabaseSync } from "../database/supabaseMirror.js";
 
 // Backend routes
@@ -20,6 +20,7 @@ import paymentRoutes   from "./routes/payments.js";
 import supportRoutes   from "./routes/support.js";
 import referralRoutes  from "./routes/referrals.js";
 import supabaseRoutes  from "./routes/supabase.js";
+import locationRoutes  from "./routes/location.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
@@ -28,6 +29,16 @@ const FRONTEND_ROOT = path.resolve(__dirname, "../frontend");
 async function startServer() {
   // ─── Database (synchronous, must be first) ───────────────────────────────
   setupDb();
+  console.log(`[db] SQLite path: ${dbPath}`);
+  if (
+    process.env.NODE_ENV === "production" &&
+    !process.env.DB_PATH &&
+    !process.env.DATA_DIR &&
+    !process.env.SUPABASE_DB_URL &&
+    !process.env.DATABASE_URL
+  ) {
+    console.warn("[db] No DB_PATH, DATA_DIR, or external database configured. Production data may not be persistent.");
+  }
 
   // ─── Express app ─────────────────────────────────────────────────────────
   const app  = express();
@@ -74,6 +85,7 @@ async function startServer() {
   app.use("/api/support",     supportRoutes);
   app.use("/api/referrals",   referralRoutes);
   app.use("/api/supabase",    supabaseRoutes);
+  app.use("/api/location",    locationRoutes);
 
   app.get("/api/health", (_req, res) =>
     res.json({ status: "ok", persistence: isSupabaseMirrorEnabled() ? "supabase-mirror" : "sqlite-local" })

@@ -21,7 +21,7 @@ import { motion, AnimatePresence } from "motion/react";
 const menuItems = [
   { name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Verifications", path: "/admin/verifications", icon: ShieldCheck },
-  { name: "Rooms", path: "/admin/rooms", icon: BedDouble },
+  { name: "Map Listings", path: "/admin/rooms", icon: BedDouble },
   { name: "Services", path: "/admin/services", icon: Briefcase },
   { name: "Users", path: "/admin/users", icon: Users },
   { name: "Reviews", path: "/admin/reviews", icon: Star },
@@ -161,7 +161,7 @@ export default function AdminLayout() {
   return (
     <div className="flex min-h-screen bg-[#f1f5f9]">
       {/* Desktop Sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-72 shrink-0 flex-col overflow-hidden border-r border-slate-200 bg-white shadow-[0_25px_80px_-40px_rgba(15,23,42,0.1)] lg:flex">
+      <aside className="sticky top-0 hidden h-screen w-72 shrink-0 flex-col overflow-hidden border-r border-slate-200 bg-white shadow-[0_25px_80px_-40px_rgba(15,23,42,0.1)] md:flex">
         <SidebarContent
           locationPath={location.pathname}
           unreadCount={unreadCount}
@@ -179,14 +179,14 @@ export default function AdminLayout() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm md:hidden"
             />
             <motion.aside
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 z-50 flex w-[85vw] max-w-72 flex-col overflow-hidden border-r border-slate-200 bg-white shadow-[0_25px_80px_-40px_rgba(15,23,42,0.3)] lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 flex w-[85vw] max-w-72 flex-col overflow-hidden border-r border-slate-200 bg-white shadow-[0_25px_80px_-40px_rgba(15,23,42,0.3)] md:hidden"
             >
               <SidebarContent
                 locationPath={location.pathname}
@@ -214,7 +214,7 @@ export default function AdminLayout() {
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(true)}
-              className="rounded-xl bg-slate-100 p-2.5 text-slate-600 transition-colors hover:bg-slate-200 lg:hidden"
+              className="rounded-xl bg-slate-100 p-2.5 text-slate-600 transition-colors hover:bg-slate-200 md:hidden"
             >
               <Menu className="h-6 w-6" />
             </button>
@@ -245,7 +245,7 @@ export default function AdminLayout() {
         </header>
 
         {/* Page Content */}
-        <main className="mx-auto w-full max-w-[1600px] flex-1 p-4 sm:p-6 lg:p-10">
+        <main className="mx-auto w-full max-w-[1600px] flex-1 p-4 sm:p-6 md:p-10">
           <motion.div
             key={location.pathname}
             initial={{ opacity: 0, y: 10 }}

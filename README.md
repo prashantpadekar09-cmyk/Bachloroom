@@ -30,9 +30,10 @@ As of March 26, 2026, Render still offers a free web service tier. This repo is 
    `GEMINI_API_KEY`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `GOOGLE_CLIENT_ID`, `VITE_GOOGLE_CLIENT_ID`
 
 Important:
-- The app uses SQLite in `database/data/database.sqlite`.
-- On Render free web services, the filesystem is ephemeral, so SQLite data can reset after redeploys/restarts.
-- For persistent production data, move the database to an external service.
+- The app uses SQLite as its live runtime database.
+- Render is configured to store that SQLite file on the persistent disk at `/var/data/database.sqlite`.
+- Keep `DB_PATH=/var/data/database.sqlite` and `DATA_DIR=/var/data` in Render so app data survives normal restarts and redeploys.
+- If you deploy somewhere without a persistent disk, move the database to an external service.
 
 ## Free Permanent Database Recommendation
 

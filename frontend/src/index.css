@@ -1,16 +1,127 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+/* Leaflet Overrides */
+.leaflet-container {
+  font-family: inherit;
+  z-index: 10;
+}
+
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+.leaflet-control-zoom-in, .leaflet-control-zoom-out {
+  background-color: white !important;
+  color: #334155 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(4px);
+  padding: 0 8px !important;
+  border-radius: 4px 0 0 0;
+}
+
+.custom-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.marker-pin {
+  width: 48px;
+  height: 48px;
+  border-radius: 50% 50% 50% 0;
+  background: #2b1c12;
+  position: absolute;
+  transform: rotate(-45deg);
+  left: 50%;
+  top: 50%;
+  margin: -24px 0 0 -24px;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.marker-pin::after {
+  content: '';
+  width: 32px;
+  height: 32px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.marker-icon {
+  z-index: 20;
+  color: #2b1c12;
+  position: relative;
+}
+
+.marker-pulse {
+  background: rgba(43, 28, 18, 0.2);
+  border-radius: 50%;
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -10px 0 0 -10px;
+  transform: rotateX(55deg);
+  z-index: -1;
+}
+
+.marker-pulse::after {
+  content: "";
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+  position: absolute;
+  margin: -10px 0 0 -10px;
+  animation: pulsate 1s ease-out;
+  animation-iteration-count: infinite;
+  opacity: 0;
+  box-shadow: 0 0 1px 2px #2b1c12;
+  animation-delay: 1.1s;
+}
+
+@keyframes pulsate {
+  0% {
+    transform: scale(0.1, 0.1);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.2, 1.2);
+    opacity: 0;
+  }
+}
 
 @theme {
   --font-sans: "DM Sans", "Segoe UI", sans-serif;
 }
 
 @layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
   html {
     background: #f1f5f9;
     height: 100%;
     text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
-    font-size: 16px;
+    /* Fluid DPI Rearrangement: Base font size scales between 14px and 16px based on viewport */
+    font-size: clamp(14px, 1.2vw + 10px, 16px);
     scroll-behavior: smooth;
   }
 
@@ -22,6 +133,8 @@
     overflow-x: hidden;
     text-rendering: optimizeLegibility;
     -webkit-tap-highlight-color: transparent;
+    /* Responsive line height for better mobile readability */
+    line-height: 1.6;
   }
 
   #root {
@@ -44,6 +157,11 @@
   textarea,
   select {
     font: inherit;
+    min-width: 0;
+    /* Prevent iOS zoom on focus by ensuring font-size is effectively 16px for inputs */
+    @media (max-width: 768px) {
+      font-size: 16px !important;
+    }
   }
 
   :focus-visible {
@@ -52,11 +170,27 @@
   }
 }
 
-@media (max-width: 360px) {
-  @layer base {
+@layer base {
+  @media (min-width: 768px) {
     html {
-      font-size: 15px;
+      /* Consistent scaling for tablets and above */
+      font-size: 16px;
     }
+  }
+  
+  @media (min-width: 1440px) {
+    html {
+      /* Extra scaling for large screens */
+      font-size: 17px;
+    }
+  }
+}
+
+@media (min-resolution: 2dppx) {
+  /* High DPI (Retina) specific optimizations */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -219,6 +353,18 @@
   }
 }
 
+@media (max-width: 767px) {
+  .luxury-table th,
+  .luxury-table td {
+    padding: 0.9rem 1rem;
+  }
+
+  .dashboard-panel,
+  .dashboard-stat {
+    border-radius: 1.5rem;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -240,4 +386,18 @@
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* DPI & Safe Area Optimizations */
+.safe-p-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.safe-m-bottom {
+  margin-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.mobile-h-adjust {
+  height: 100vh;
+  height: 100dvh;
 }

@@ -142,7 +142,7 @@ export default function UnlockedContactModal({
                 {similarRooms.map((r) => (
                   <Link 
                     key={r.id} 
-                    to={`/rooms/${r.id}`}
+                    to={`/map/${r.id}`}
                     onClick={onClose}
                     className="group"
                   >

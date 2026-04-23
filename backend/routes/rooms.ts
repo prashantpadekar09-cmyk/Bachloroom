@@ -1,6 +1,7 @@
 import express from "express";
 import { db } from "../../database/setup.js";
 import crypto from "crypto";
+import { GoogleGenAI } from "@google/genai";
 import { authenticateToken, verifyToken } from "../middleware/auth.js";
 import {
   awardReferralReward,
@@ -10,6 +11,7 @@ import {
 import { scheduleSupabaseSync } from "../../database/supabaseMirror.js";
 
 const router = express.Router();
+const geminiApiKey = (process.env.GEMINI_API_KEY || "").trim();
 
 const getOptionalUser = (req: any) => {
   const authHeader = req.headers.authorization;
@@ -99,6 +101,39 @@ router.get("/luxury", (req, res) => {
     }));
     res.json({ rooms });
   } catch (_) { res.status(500).json({ error: "Internal server error" }); }
+});
+
+router.get("/:id/price-evaluation", async (req, res) => {
+  try {
+    const room = db.prepare("SELECT city, location, type, price, billingPeriod, amenities FROM rooms WHERE id = ?").get(req.params.id) as any;
+    if (!room) return res.status(404).json({ error: "Room not found" });
+
+    if (!geminiApiKey || room.billingPeriod === "night" || Number(room.price) <= 0) {
+      return res.json({ evaluation: null });
+    }
+
+    const amenities = safeParseArray(room.amenities);
+    const prompt = `Evaluate the rent price for this room in India:
+City: ${room.city}
+Location: ${room.location}
+Type: ${room.type}
+Price: Rs. ${room.price}/month
+Amenities: ${amenities.join(", ")}
+
+Is this price 'Fair', 'Overpriced', or a 'Good Deal'? Respond with ONLY ONE of those three phrases.`;
+
+    const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: prompt,
+    });
+
+    const evaluation = response.text?.trim();
+    res.json({ evaluation: evaluation || null });
+  } catch (error) {
+    console.warn("[rooms] Price evaluation failed:", (error as Error)?.message || error);
+    res.json({ evaluation: null });
+  }
 });
 
 router.get("/:id", (req, res) => {

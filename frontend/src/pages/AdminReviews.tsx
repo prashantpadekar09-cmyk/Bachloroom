@@ -124,7 +124,7 @@ export default function AdminReviews() {
           <p className="text-gray-500 font-bold">No reviews found.</p>
         </AdminSurface>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <AnimatePresence mode="popLayout">
             {filteredReviews.map((review) => (
               <motion.div 

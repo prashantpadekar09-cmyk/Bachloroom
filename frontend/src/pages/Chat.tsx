@@ -241,7 +241,7 @@ export default function Chat() {
 
   return (
     <div className="min-h-[calc(100vh-64px)] px-3 py-4 sm:px-4 sm:py-6">
-      <div className="mx-auto flex h-[calc(100vh-88px)] max-w-5xl flex-col gap-4 lg:h-[calc(100vh-116px)] lg:flex-row">
+      <div className="mx-auto flex h-[calc(100vh-88px)] max-w-5xl flex-col gap-4 md:h-[calc(100vh-116px)] md:flex-row">
         <div
           className={`overflow-hidden rounded-[28px] border border-[#d5d0c5] bg-[#f6efe5] shadow-sm ${
             otherUserId ? "hidden md:flex md:w-[320px] md:flex-col" : "flex w-full flex-1 flex-col"

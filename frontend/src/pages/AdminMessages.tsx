@@ -240,14 +240,14 @@ export default function AdminMessages() {
       />
 
       <AdminSurface className="overflow-hidden">
-        <div className="flex min-h-[70vh] flex-col lg:flex-row">
-          <aside className="border-b border-gray-100 bg-slate-50 lg:w-[320px] lg:border-b-0 lg:border-r">
+        <div className="flex min-h-[70vh] flex-col md:flex-row">
+          <aside className="border-b border-gray-100 bg-slate-50 md:w-[320px] md:border-b-0 md:border-r">
             <div className="border-b border-gray-100 px-4 py-4">
               <h2 className="text-lg font-bold text-gray-900">Queries</h2>
               <p className="mt-1 text-sm text-gray-500">Owners and users</p>
             </div>
 
-            <div className="max-h-[28vh] overflow-y-auto p-3 lg:max-h-[70vh]">
+            <div className="max-h-[28vh] overflow-y-auto p-3 md:max-h-[70vh]">
               {queries.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-gray-200 bg-white px-4 py-6 text-center text-sm text-gray-500">
                   No queries found.
@@ -304,7 +304,7 @@ export default function AdminMessages() {
             {selectedQuery ? (
               <>
                 <div className="border-b border-gray-100 p-5">
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                       <div className="flex items-center gap-2">
                         <h2 className="text-xl font-bold text-gray-900">{selectedQuery.userName}</h2>

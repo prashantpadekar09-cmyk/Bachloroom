@@ -367,16 +367,16 @@ export default function UserDashboard() {
 
 
 
-        <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
-          <div className="flex-shrink-0 lg:w-64">
-            <DashboardSurface className="p-2 lg:p-3">
-              <nav className="hide-scrollbar flex gap-2 overflow-x-auto lg:block lg:space-y-1 lg:overflow-visible">
+        <div className="flex flex-col gap-6 md:flex-row md:gap-8">
+          <div className="flex-shrink-0 md:w-64">
+            <DashboardSurface className="p-2 md:p-3">
+              <nav className="hide-scrollbar flex gap-2 overflow-x-auto md:block md:space-y-1 md:overflow-visible">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex min-w-max items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all lg:w-full ${
+                    className={`flex min-w-max items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all md:w-full ${
                       activeTab === tab.id
                         ? "bg-[linear-gradient(135deg,#2b1c12_0%,#8a6431_100%)] text-[#f8e7bf] shadow-md shadow-amber-900/10"
                         : "text-slate-600 hover:bg-white hover:text-[#8a6431]"
@@ -581,7 +581,7 @@ export default function UserDashboard() {
                             {room.city}
                           </p>
                           <div className="flex items-center gap-2">
-                            <Link to={`/rooms/${room.id}`} className="flex-grow rounded-xl border border-gray-100 bg-gray-50 py-2 text-center font-medium text-gray-900 transition-colors hover:bg-gray-100">
+                            <Link to={`/map/${room.id}`} className="flex-grow rounded-xl border border-gray-100 bg-gray-50 py-2 text-center font-medium text-gray-900 transition-colors hover:bg-gray-100">
                               View Details
                             </Link>
                             <button

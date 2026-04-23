@@ -61,7 +61,7 @@ const accentStyles = {
 
 export function DashboardShell({ children }: DashboardShellProps) {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 md:px-8 md:py-8">
       <div className="mb-6 flex items-center justify-end">
         <Link
           to="/"
@@ -93,7 +93,7 @@ export function DashboardHero({
       <div className="absolute inset-y-0 right-0 w-1/2 bg-[radial-gradient(circle_at_top_right,rgba(255,248,235,0.2),transparent_55%)]" />
       <div className="absolute -left-10 top-0 h-40 w-40 rounded-full bg-amber-100/20 blur-3xl" />
       <div className="absolute bottom-0 right-0 h-48 w-48 rounded-full bg-amber-300/20 blur-3xl" />
-      <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+      <div className="relative flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div className="max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-200/35 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.28em] text-amber-100 backdrop-blur-md">
             <Sparkles className="h-4 w-4 text-amber-300" />

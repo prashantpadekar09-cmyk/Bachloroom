@@ -497,7 +497,7 @@ export default function ServiceProviderDashboard() {
             <p className="mt-2 text-gray-500">Create your first service to show up in the marketplace.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {services.map((service) => (
               <div key={service.id} className="overflow-hidden rounded-[1.75rem] border border-gray-100 bg-white shadow-sm">
                 {service.image && (

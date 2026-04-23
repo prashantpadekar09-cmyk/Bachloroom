@@ -480,7 +480,7 @@ export default function OwnerDashboard() {
             <p className="text-gray-500">You haven't added any rooms yet.</p>
           </DashboardSurface>
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:grid-cols-3">
             {myRooms.map((room) => (
               <div key={room.id} className="flex flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
                 <div className="relative h-48">
@@ -503,7 +503,7 @@ export default function OwnerDashboard() {
                   <p className="mb-4 text-sm text-gray-500">{room.location}, {room.city}</p>
                   <div className="mt-auto flex space-x-2">
                     <Link
-                      to={`/rooms/${room.id}`}
+                      to={`/map/${room.id}`}
                       className="flex-1 rounded-lg border border-gray-200 bg-gray-50 py-2 text-center font-medium text-gray-900 transition-colors hover:bg-gray-100"
                     >
                       View

@@ -432,7 +432,7 @@ export default function AdminRooms() {
                   <div>
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="text-xl font-black text-gray-900 line-clamp-1">{room.title}</h3>
-                      <Link to={`/rooms/${room.id}`} className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
+                      <Link to={`/map/${room.id}`} className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
                         <ExternalLink className="h-5 w-5" />
                       </Link>
                     </div>

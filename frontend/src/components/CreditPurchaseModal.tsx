@@ -157,7 +157,7 @@ export default function CreditPurchaseModal({ isOpen, onClose, onSuccess }: Cred
                 Back to Packages
               </button>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div className="space-y-6">
                   <div className="p-8 rounded-[2.5rem] bg-slate-50 border border-slate-100">
                     <h3 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">

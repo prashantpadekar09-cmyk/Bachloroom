@@ -25,7 +25,7 @@ export function AdminPageHero({
     <section className="relative overflow-hidden rounded-[2rem] border border-amber-200/35 bg-[linear-gradient(135deg,#16120d_0%,#2a1c11_28%,#8a6431_78%,#f6ead6_140%)] p-6 text-white shadow-[0_35px_120px_-50px_rgba(84,56,21,0.7)] sm:p-8">
       <div className="absolute -right-16 top-0 h-52 w-52 rounded-full bg-amber-50/15 blur-3xl" />
       <div className="absolute bottom-0 left-0 h-44 w-44 rounded-full bg-amber-300/25 blur-3xl" />
-      <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <div className="relative flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <div className="max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-200/30 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-amber-50/95 backdrop-blur-md">
             <Sparkles className="h-4 w-4 text-[#f4deb1]" />

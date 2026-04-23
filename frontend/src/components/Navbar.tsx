@@ -17,7 +17,7 @@ import BrandLogo from "./BrandLogo";
 const navLinks = [
   { name: "Home", path: "/", icon: Home },
   { name: "Explore", path: "/explore", icon: Compass },
-  { name: "Rooms", path: "/rooms", icon: BedDouble },
+  { name: "Map", path: "/map", icon: BedDouble },
   { name: "Services", path: "/services", icon: Sparkles },
 ];
 
@@ -27,6 +27,7 @@ export default function Navbar() {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const isMapRoute = location.pathname === "/map";
 
   const dashboardPath =
     user?.role === "admin"
@@ -49,7 +50,7 @@ export default function Navbar() {
   const mobileBottomLinks = [
     { name: "Home", path: "/", icon: Home },
     { name: "Explore", path: "/explore", icon: Compass },
-    { name: "Rooms", path: "/rooms", icon: BedDouble },
+    { name: "Map", path: "/map", icon: BedDouble },
     { name: "Services", path: "/services", icon: Sparkles },
   ];
 
@@ -88,20 +89,19 @@ export default function Navbar() {
 
   return (
     <>
-      <div className="h-[76px] sm:h-[84px]" />
+      {!isMapRoute && <div className="h-[76px] sm:h-[84px]" />}
       <nav className={`fixed inset-x-0 top-0 z-50 border-b backdrop-blur-2xl transition-all duration-200 ${
         isScrolled
           ? "border-white/80 bg-white/92 shadow-[0_22px_60px_-32px_rgba(59,130,246,0.18)]"
           : "border-white/70 bg-white/82 shadow-[0_20px_50px_-36px_rgba(59,130,246,0.16)]"
       }`}>
-        <div className="mx-auto flex min-h-[76px] max-w-7xl items-center justify-between gap-3 px-4 sm:min-h-[84px] sm:gap-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex min-h-[76px] max-w-7xl items-center justify-between gap-3 px-4 sm:min-h-[84px] sm:gap-4 sm:px-6 md:px-8">
           <Link
             to="/"
             className="flex min-w-0 items-center gap-3 rounded-2xl px-1 py-2 transition-transform hover:-translate-y-0.5"
           >
             <BrandLogo
-              subtitle="Search, book, and manage rooms faster"
-              subtitleClassName="hidden sm:block"
+              subtitle=""
               showBackdrop
             />
           </Link>

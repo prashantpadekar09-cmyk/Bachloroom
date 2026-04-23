@@ -121,11 +121,13 @@ export default function BrandLogo({
             >
               Bachloroom
             </p>
-            <p
-              className={`truncate text-xs font-medium text-[#7a6553] ${subtitleClassName}`.trim()}
-            >
-              {subtitle}
-            </p>
+            {subtitle ? (
+              <p
+                className={`truncate text-xs font-medium text-[#7a6553] ${subtitleClassName}`.trim()}
+              >
+                {subtitle}
+              </p>
+            ) : null}
           </div>
         </div>
       ) : null}

@@ -6,6 +6,7 @@
 import React, { lazy, Suspense, type ReactNode } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { LocationProvider } from "./context/LocationContext";
 import Navbar from "./components/Navbar";
 import AdminLayout from "./components/AdminLayout";
 import { getAuthRedirectPath } from "./utils/authRedirect";
@@ -13,7 +14,7 @@ import { getAuthRedirectPath } from "./utils/authRedirect";
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
-const RoomListing = lazy(() => import("./pages/RoomListing"));
+const MapView = lazy(() => import("./pages/MapView"));
 const RoomDetail = lazy(() => import("./pages/RoomDetail"));
 const UserDashboard = lazy(() => import("./pages/UserDashboard"));
 const OwnerDashboard = lazy(() => import("./pages/OwnerDashboard"));
@@ -85,6 +86,7 @@ function AppShell() {
   const location = useLocation();
   const hideSharedNavbar =
     location.pathname === "/dashboard" || location.pathname.startsWith("/admin");
+  const isMapRoute = location.pathname === "/map";
 
   return (
     <div className="site-shell">
@@ -99,7 +101,7 @@ function AppShell() {
       <div className="relative z-10 flex min-h-screen flex-col">
         {!hideSharedNavbar && <Navbar />}
         <main
-          className={`flex-grow ${hideSharedNavbar ? "" : "pb-[calc(env(safe-area-inset-bottom,0px)+7rem)] lg:pb-0"}`}
+          className={`flex-grow ${hideSharedNavbar || isMapRoute ? "" : "pb-[calc(env(safe-area-inset-bottom,0px)+7rem)] lg:pb-0"}`}
         >
           <Suspense fallback={<RouteFallback />}>
             <Routes>
@@ -107,8 +109,8 @@ function AppShell() {
               <Route path="/login" element={<GuestOnlyRoute><Login /></GuestOnlyRoute>} />
               <Route path="/register" element={<GuestOnlyRoute><Register /></GuestOnlyRoute>} />
               <Route path="/explore" element={<Explore />} />
-              <Route path="/rooms" element={<RoomListing />} />
-              <Route path="/rooms/:id" element={<RoomDetail />} />
+              <Route path="/map" element={<MapView />} />
+              <Route path="/map/:id" element={<RoomDetail />} />
               <Route path="/services" element={<ServicesMarketplace />} />
               <Route path="/premium-payment" element={<ProtectedRoute><PremiumPayment /></ProtectedRoute>} />
               <Route path="/support" element={<ProtectedRoute><SupportInbox /></ProtectedRoute>} />
@@ -116,6 +118,7 @@ function AppShell() {
               <Route path="/owner-dashboard" element={<ProtectedRoute><OwnerDashboard /></ProtectedRoute>} />
               <Route path="/service-provider-dashboard" element={<ProtectedRoute><ServiceProviderDashboard /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+                <Route index element={<Navigate to="dashboard" replace />} />
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="verifications" element={<AdminVerifications />} />
                 <Route path="rooms" element={<AdminRooms />} />
@@ -127,6 +130,7 @@ function AppShell() {
               </Route>
               <Route path="/chat" element={<Chat />} />
               <Route path="/chat/:userId" element={<Chat />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
         </main>
@@ -138,9 +142,11 @@ function AppShell() {
 export default function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppShell />
-      </Router>
+      <LocationProvider>
+        <Router>
+          <AppShell />
+        </Router>
+      </LocationProvider>
     </AuthProvider>
   );
 }

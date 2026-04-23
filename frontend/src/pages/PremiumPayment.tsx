@@ -148,7 +148,7 @@ export default function PremiumPayment() {
 
   if (!statusData) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 md:px-8">
         <div className="rounded-[2rem] border border-red-100 bg-white p-8 shadow-sm">
           <h1 className="text-2xl font-black text-gray-900">Premium payment page could not load</h1>
           <p className="mt-3 text-sm leading-6 text-gray-600">{error || "Something went wrong while loading this page."}</p>
@@ -183,8 +183,8 @@ export default function PremiumPayment() {
         : "No request yet";
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-      <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 md:px-8">
+      <div className="grid gap-8 md:grid-cols-[1.1fr_0.9fr]">
         <section className="rounded-[2rem] border border-amber-100 bg-gradient-to-br from-white via-amber-50 to-orange-50 p-8 shadow-sm">
           <div className="inline-flex items-center rounded-full bg-gray-900 px-4 py-1.5 text-sm font-semibold text-white">
             <Crown className="mr-2 h-4 w-4 text-amber-300" />

@@ -8,13 +8,29 @@ import { openSqliteDatabase } from "./sqlite.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Data directory is at database/data or custom DATA_DIR for Render Disk
-const dbDir = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : path.resolve(__dirname, "./data");
+function resolveDbPath() {
+  const explicitDbPath = process.env.DB_PATH?.trim();
+  if (explicitDbPath) {
+    return path.resolve(explicitDbPath);
+  }
+
+  const explicitDataDir = process.env.DATA_DIR?.trim();
+  if (explicitDataDir) {
+    return path.join(path.resolve(explicitDataDir), "database.sqlite");
+  }
+
+  if (process.env.RENDER && fs.existsSync("/var/data")) {
+    return path.join("/var/data", "database.sqlite");
+  }
+
+  return path.resolve(__dirname, "./data/database.sqlite");
+}
+
+export const dbPath = resolveDbPath();
+const dbDir = path.dirname(dbPath);
 if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
-
-const dbPath = path.join(dbDir, "database.sqlite");
 const rollbackJournalPath = `${dbPath}-journal`;
 
 // OneDrive on Windows can hold onto SQLite rollback journals long enough to

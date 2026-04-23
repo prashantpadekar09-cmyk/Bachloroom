@@ -1,29 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import {
-  Apple,
   ArrowRight,
-  BedDouble,
-  Building,
-  Building2,
-  CalendarDays,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  Facebook,
-  Heart,
-  Instagram,
   MapPin,
-  Play,
   Search,
   ShieldCheck,
   Sparkles,
   Star,
-  Twitter,
-  Users,
   Wallet,
-  Wifi,
 } from "lucide-react";
 import BrandLogo from "../components/BrandLogo";
 
@@ -42,62 +30,21 @@ type RoomType = {
 const heroSlides = [
   {
     image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1600&q=80",
-    eyebrow: "Luxury rentals for modern living",
-    title: "Find Your Perfect Room Today",
-    subtitle: "Affordable, Verified Rooms for Bachelors & Students",
+    eyebrow: "Premium rental discovery",
+    title: "A cleaner way to find your next room.",
+    subtitle: "Search verified stays without getting lost in too many filters.",
   },
   {
     image: "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1600&q=80",
-    eyebrow: "Premium spaces across top cities",
-    title: "Move Into Stylish, Ready-To-Live Spaces",
-    subtitle: "Curated PGs, studios, and shared rooms for students and professionals.",
+    eyebrow: "Curated for students and professionals",
+    title: "Simple search. Better spaces. Faster decisions.",
+    subtitle: "Start with city and budget, then move straight to high-quality listings.",
   },
   {
     image: "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1600&q=80",
-    eyebrow: "Trusted by renters and owners",
-    title: "Search Smart. Visit Fast. Book Confidently.",
-    subtitle: "High-quality listings with verified owners, premium visuals, and flexible budgets.",
-  },
-];
-
-const recentSearches = ["Pune PG under 12000", "Mumbai single room", "No broker hostel in Nashik"];
-
-const quickActions = [
-  {
-    title: "Browse verified rooms",
-    description: "Start with trusted listings and clear pricing.",
-    action: "Go to rooms",
-    path: "/rooms",
-  },
-  {
-    title: "Create your account",
-    description: "Choose renter, owner, or service provider in one place.",
-    action: "Open signup",
-    path: "/register",
-  },
-  {
-    title: "Explore support services",
-    description: "Find moving help and extra services when you need them.",
-    action: "View services",
-    path: "/services",
-  },
-];
-
-const easySteps = [
-  {
-    title: "Search by city",
-    description: "Start with location and budget instead of long filters.",
-    icon: MapPin,
-  },
-  {
-    title: "Check trusted details",
-    description: "See photos, pricing, and verification at a glance.",
-    icon: ShieldCheck,
-  },
-  {
-    title: "Move faster",
-    description: "Contact, book, and manage everything from one app.",
-    icon: CalendarDays,
+    eyebrow: "Trust-first experience",
+    title: "Beautiful spaces with clearer details up front.",
+    subtitle: "Verified owners, premium visuals, and a smoother path from search to shortlist.",
   },
 ];
 
@@ -105,107 +52,84 @@ const fallbackFeaturedRooms: RoomType[] = [
   { id: "fallback-1", title: "Skyline Studio Retreat", location: "Koregaon Park", city: "Pune", rating: 4.9, price: "Rs 18,500/mo", image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80", type: "Studio Apartment", verified: true },
   { id: "fallback-2", title: "Urban Bachelor Suite", location: "Andheri West", city: "Mumbai", rating: 4.8, price: "Rs 16,000/mo", image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=900&q=80", type: "Single Room", verified: true },
   { id: "fallback-3", title: "Co-Live Comfort Hub", location: "Baner", city: "Pune", rating: 4.7, price: "Rs 11,500/mo", image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80", type: "Shared Room", verified: true },
-  { id: "fallback-4", title: "Minimal PG Residence", location: "Panaji", city: "Goa", rating: 4.9, price: "Rs 13,000/mo", image: "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=900&q=80", type: "PG", verified: true },
 ];
 
-const galleryImages = [
-  { title: "Modern Bedroom", image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80", className: "md:col-span-2 md:row-span-2" },
-  { title: "Shared Comfort", image: "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=900&q=80", className: "" },
-  { title: "PG Lounge", image: "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=900&q=80", className: "" },
-  { title: "Studio Apartment", image: "https://images.unsplash.com/photo-1502672023488-70e25813eb80?auto=format&fit=crop&w=900&q=80", className: "md:col-span-2" },
-];
+const quickCities = ["Pune", "Mumbai", "Nashik", "Goa"];
 
-const categories = [
+const trustPoints = [
   {
-    title: "Single Room",
-    description: "Private comfort for focused living",
-    icon: BedDouble,
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80",
-    count: "1.2K stays",
+    title: "Less clutter, faster search",
+    description: "Start with only what matters first: city, budget, and room type.",
+    icon: Sparkles,
   },
   {
-    title: "Shared Room",
-    description: "Affordable living with social comfort",
-    icon: Users,
-    image: "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=900&q=80",
-    count: "860 stays",
+    title: "Verified listings",
+    description: "See trusted rooms with clearer details, pricing, and location context.",
+    icon: ShieldCheck,
   },
   {
-    title: "PG",
-    description: "Managed stays with essentials included",
-    icon: Building2,
-    image: "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=900&q=80",
-    count: "940 stays",
-  },
-  {
-    title: "Hostel",
-    description: "Budget-friendly spaces near colleges and work hubs",
-    icon: Building,
-    image: "https://images.unsplash.com/photo-1502672023488-70e25813eb80?auto=format&fit=crop&w=900&q=80",
-    count: "720 stays",
+    title: "Budget-friendly choices",
+    description: "Browse premium, practical spaces built for real student and working life.",
+    icon: Wallet,
   },
 ];
 
-const reasons = [
-  { title: "Verified Listings", description: "Every featured property is checked for quality, authenticity, and trust.", icon: ShieldCheck },
-  { title: "Affordable Pricing", description: "Clear pricing with room options built for students and working professionals.", icon: Wallet },
-  { title: "Easy Unlock", description: "Discover, compare, shortlist, and unlock owner details from one polished flow.", icon: CalendarDays },
-  { title: "Trusted Owners", description: "Build confidence with real owner profiles, ratings, and verified badges.", icon: CheckCircle2 },
-];
-
-const premiumTestimonials = [
-  {
-    name: "Aarav Sharma",
-    city: "Pune",
-    rating: 4.9,
-    tag: "Student renter",
-    detail: "Unlocking the owner details was simple, the room looked exactly like the photos, and connecting directly felt much smoother than I expected.",
-  },
-  {
-    name: "Priya Verma",
-    city: "Mumbai",
-    rating: 4.8,
-    tag: "Working professional",
-    detail: "I shortlisted a verified room in one evening. The app feels clean, premium, and easy to trust.",
-  },
-  {
-    name: "Rohan Patil",
-    city: "Nashik",
-    rating: 4.7,
-    tag: "First-time renter",
-    detail: "Clear pricing, fast owner response, and a much better experience than checking random listings online.",
-  },
-];
+const testimonial = {
+  name: "Aarav Sharma",
+  role: "Student renter in Pune",
+  quote: "The homepage feels much cleaner now. I could search by city, open listings quickly, and shortlist without fighting the interface.",
+};
 
 function SectionHeading({ eyebrow, title, subtitle }: { eyebrow: string; title: string; subtitle?: string }) {
   return (
     <div className="max-w-2xl">
-      <p className="text-xs font-semibold uppercase tracking-[0.32em] text-amber-600">{eyebrow}</p>
-      <h2 className="mt-3 text-3xl font-black tracking-tight text-[#1e140d] sm:text-4xl">{title}</h2>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-amber-700 sm:text-xs">{eyebrow}</p>
+      <h2 className="mt-3 text-3xl font-black tracking-tight text-[#1f170f] sm:text-4xl md:text-5xl">{title}</h2>
       {subtitle ? <p className="mt-4 text-sm leading-7 text-[#5f4b3b] sm:text-base">{subtitle}</p> : null}
     </div>
   );
 }
 
-function FeaturedRoomCard({ room, onQuickView }: { room: RoomType; onQuickView: (room: RoomType) => void }) {
+function FeaturedRoomCard({ room, onSelect }: { room: RoomType; onSelect: (room: RoomType) => void }) {
   return (
-    <motion.article whileHover={{ y: -8, scale: 1.01 }} transition={{ duration: 0.22 }} className="group overflow-hidden rounded-[28px] border border-amber-100/80 bg-[linear-gradient(180deg,#fffdf9_0%,#f8f1e7_100%)] shadow-[0_30px_80px_-42px_rgba(36,25,15,0.34)]">
+    <motion.button
+      type="button"
+      whileHover={{ y: -6 }}
+      transition={{ duration: 0.2 }}
+      onClick={() => onSelect(room)}
+      className="group overflow-hidden rounded-[28px] border border-amber-100/80 bg-[linear-gradient(180deg,#fffdf9_0%,#f7efe4_100%)] text-left shadow-[0_30px_80px_-48px_rgba(36,25,15,0.34)]"
+    >
       <div className="relative overflow-hidden">
-        <img src={room.image} alt={room.title} loading="lazy" className="h-72 w-full object-cover transition duration-700 group-hover:scale-110" referrerPolicy="no-referrer" />
-        <div className="absolute left-4 top-4 rounded-full border border-amber-200/60 bg-[#fff7ec]/92 px-3 py-2 text-xs font-bold text-amber-700 shadow-lg">{room.price}</div>
-        {room.verified ? <div className="absolute right-16 top-4 inline-flex items-center gap-1 rounded-full bg-[#1f170f]/88 px-3 py-2 text-xs font-semibold text-amber-100 shadow-lg"><CheckCircle2 className="h-3.5 w-3.5" />Verified</div> : null}
-        <button type="button" aria-label={`Add ${room.title} to wishlist`} className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/92 text-slate-500 shadow-lg transition hover:text-amber-700"><Heart className="h-5 w-5" /></button>
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/30 to-transparent opacity-0 transition group-hover:opacity-100" />
-        <button type="button" onClick={() => onQuickView(room)} className="absolute bottom-4 left-4 rounded-full bg-[#1f170f]/88 px-4 py-2 text-sm font-semibold text-amber-50 opacity-0 transition group-hover:opacity-100">Quick View</button>
+        <img src={room.image} alt={room.title} loading="lazy" className="h-72 w-full object-cover transition duration-700 group-hover:scale-105" referrerPolicy="no-referrer" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1b140d]/60 via-transparent to-transparent" />
+        <div className="absolute left-4 top-4 rounded-full bg-[#fff7ec]/95 px-3 py-1.5 text-xs font-bold text-amber-700 shadow-lg">
+          {room.price}
+        </div>
+        {room.verified ? (
+          <div className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-[#1f170f]/85 px-3 py-1.5 text-xs font-semibold text-amber-100">
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            Verified
+          </div>
+        ) : null}
       </div>
+
       <div className="space-y-3 p-5">
         <div className="flex items-start justify-between gap-3">
-          <div><h3 className="text-xl font-bold text-[#1e140d]">{room.title}</h3><p className="mt-1 text-sm text-[#7a6553]">{room.type}</p></div>
-          <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1.5 text-sm font-semibold text-amber-700"><Star className="h-4 w-4 fill-current" />{room.rating}</div>
+          <div>
+            <h3 className="text-xl font-bold text-[#1f170f]">{room.title}</h3>
+            <p className="mt-1 text-sm text-[#7a6553]">{room.type}</p>
+          </div>
+          <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1.5 text-sm font-semibold text-amber-700">
+            <Star className="h-4 w-4 fill-current" />
+            {room.rating}
+          </div>
         </div>
-        <div className="flex items-center gap-2 text-sm text-[#5f4b3b]"><MapPin className="h-4 w-4 text-amber-700" />{room.location}, {room.city}</div>
+        <div className="flex items-center gap-2 text-sm text-[#5f4b3b]">
+          <MapPin className="h-4 w-4 text-amber-700" />
+          {room.location}, {room.city}
+        </div>
       </div>
-    </motion.article>
+    </motion.button>
   );
 }
 
@@ -219,7 +143,10 @@ export default function Home() {
   const [heroQ, setHeroQ] = useState("");
 
   useEffect(() => {
-    const slider = window.setInterval(() => setActiveSlide((current) => (current + 1) % heroSlides.length), 4200);
+    const slider = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % heroSlides.length);
+    }, 4200);
+
     return () => window.clearInterval(slider);
   }, []);
 
@@ -229,23 +156,25 @@ export default function Home() {
         const res = await fetch("/api/rooms/cities");
         if (!res.ok) return;
         const data = await res.json();
-        if (Array.isArray(data?.cities)) setCities(data.cities);
+        if (Array.isArray(data?.cities)) {
+          setCities(data.cities);
+        }
       } catch {
         // ignore
       }
     };
 
-    fetchCities();
+    void fetchCities();
   }, []);
 
   useEffect(() => {
     const parseArray = (value: unknown) => {
       if (Array.isArray(value)) return value;
       if (typeof value !== "string" || !value.trim()) return [];
-
       if (!value.trim().startsWith("[")) {
-        return value.split(",").map((s) => s.trim()).filter(Boolean);
+        return value.split(",").map((item) => item.trim()).filter(Boolean);
       }
+
       try {
         const parsed = JSON.parse(value);
         return Array.isArray(parsed) ? parsed : [value];
@@ -256,9 +185,7 @@ export default function Home() {
 
     const getRoomPriceText = (room: any) =>
       room.priceLabel ||
-      (room.price > 0
-        ? `Rs ${room.price.toLocaleString()}/${room.billingPeriod === "night" ? "night" : "mo"}`
-        : "Check source");
+      (room.price > 0 ? `Rs ${room.price.toLocaleString()}/${room.billingPeriod === "night" ? "night" : "mo"}` : "Check source");
 
     const fetchFeaturedRooms = async () => {
       try {
@@ -271,9 +198,9 @@ export default function Home() {
         const data = await res.json();
         const apiRooms = Array.isArray(data.rooms) ? data.rooms : [];
 
-        // Strictly only luxury rooms — if none exist, show nothing
-        const mappedRooms: RoomType[] = apiRooms.slice(0, 4).map((room: any) => {
+        const mappedRooms: RoomType[] = apiRooms.slice(0, 3).map((room: any) => {
           const images = parseArray(room.images);
+
           return {
             id: String(room.id),
             title: room.title,
@@ -295,137 +222,134 @@ export default function Home() {
     };
 
     void fetchFeaturedRooms();
-
-    const onVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        void fetchFeaturedRooms();
-      }
-    };
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
   }, []);
 
+  const visibleRooms = useMemo(
+    () => (featuredRooms && featuredRooms.length > 0 ? featuredRooms : fallbackFeaturedRooms),
+    [featuredRooms],
+  );
+
+  const openSearch = (city = heroCity, query = heroQ) => {
+    const params = new URLSearchParams();
+    if (query.trim()) params.set("q", query.trim());
+    if (city.trim()) params.set("city", city.trim());
+    navigate(`/explore${params.toString() ? `?${params.toString()}` : ""}`);
+  };
+
   return (
-    <div className="bg-[linear-gradient(180deg,#f5eee5_0%,#efe1cf_18%,#fffaf3_42%,#f8f1e7_72%,#ffffff_100%)] text-slate-950">
-      <section className="relative min-h-[calc(100vh-84px)] overflow-hidden rounded-b-[2.5rem] bg-slate-950">
+    <div className="bg-[linear-gradient(180deg,#f5eee5_0%,#f0e4d2_18%,#fffaf4_48%,#ffffff_100%)] text-slate-950">
+      <section className="relative overflow-hidden bg-[#120e0a]">
         <AnimatePresence mode="wait">
-          <motion.div key={heroSlides[activeSlide].image} initial={{ opacity: 0.2, scale: 1.03 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0.2, scale: 1.03 }} transition={{ duration: 0.8, ease: "easeOut" }} className="absolute inset-0">
+          <motion.div
+            key={heroSlides[activeSlide].image}
+            initial={{ opacity: 0.25, scale: 1.03 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0.25, scale: 1.03 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="absolute inset-0"
+          >
             <img src={heroSlides[activeSlide].image} alt={heroSlides[activeSlide].title} fetchpriority="high" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.38)_0%,rgba(15,23,42,0.58)_48%,rgba(15,23,42,0.72)_100%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(18,14,10,0.9)_0%,rgba(18,14,10,0.68)_45%,rgba(18,14,10,0.45)_100%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(18,14,10,0.12)_0%,rgba(18,14,10,0.2)_45%,rgba(18,14,10,0.84)_100%)]" />
           </motion.div>
         </AnimatePresence>
-        <div className="absolute inset-x-0 top-0 h-40 bg-[linear-gradient(180deg,rgba(15,23,42,0.42)_0%,transparent_100%)]" />
 
-        <div className="relative z-10 mx-auto grid min-h-[calc(100vh-84px)] max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:px-8 lg:py-12">
-          <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="flex flex-col justify-center">
-            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-white/90 backdrop-blur-xl"><Sparkles className="h-4 w-4 text-amber-300" />{heroSlides[activeSlide].eyebrow}</div>
-            <h1 className="mt-6 max-w-4xl text-5xl font-black tracking-tight text-white sm:text-6xl lg:text-7xl">{heroSlides[activeSlide].title}</h1>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-slate-200 sm:text-lg">{heroSlides[activeSlide].subtitle}</p>
+        <div className="relative z-10 mx-auto grid min-h-[calc(100svh-76px)] max-w-7xl gap-10 px-4 py-10 sm:px-6 md:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end lg:py-16">
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="flex flex-col justify-center">
+            <div className="mt-8 inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/90 backdrop-blur-xl sm:text-xs">
+              <Sparkles className="h-4 w-4 text-amber-300" />
+              {heroSlides[activeSlide].eyebrow}
+            </div>
+            <h1 className="mt-6 max-w-4xl text-4xl font-black tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
+              {heroSlides[activeSlide].title}
+            </h1>
+            <p className="mt-5 max-w-2xl text-sm leading-7 text-slate-200 sm:text-lg sm:leading-8">
+              {heroSlides[activeSlide].subtitle}
+            </p>
 
-            <div className="mt-8 rounded-[2rem] border border-white/15 bg-white/10 p-4 backdrop-blur-xl sm:p-5">
-              <div className="grid gap-3 sm:grid-cols-[1fr_0.7fr_auto] sm:items-center">
+            <div className="mt-8 max-w-3xl rounded-[2rem] border border-white/15 bg-white/10 p-4 backdrop-blur-xl sm:p-5">
+              <div className="grid gap-3 lg:grid-cols-[1fr_0.72fr_auto]">
                 <div className="relative">
                   <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-amber-200/90" />
                   <input
                     value={heroQ}
-                    onChange={(e) => setHeroQ(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        const qs = new URLSearchParams();
-                        if (heroQ.trim()) qs.set("q", heroQ.trim());
-                        if (heroCity.trim()) qs.set("city", heroCity.trim());
-                        navigate(`/rooms${qs.toString() ? `?${qs.toString()}` : ""}`);
+                    onChange={(event) => setHeroQ(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        openSearch();
                       }
                     }}
-                    placeholder="Search rooms, areas, landmarks…"
-                    className="w-full rounded-2xl border border-white/15 bg-white/10 py-3 pl-11 pr-4 text-sm font-semibold text-white placeholder:text-white/60 outline-none transition focus:border-white/25"
+                    placeholder="Search by area, landmark or room"
+                    className="w-full rounded-2xl border border-white/15 bg-white/10 py-3 pl-11 pr-4 text-sm font-semibold text-white placeholder:text-white/60 outline-none transition focus:border-white/30"
                   />
                 </div>
 
                 <select
                   value={heroCity}
-                  onChange={(e) => setHeroCity(e.target.value)}
-                  className="w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-semibold text-white outline-none transition focus:border-white/25"
+                  onChange={(event) => setHeroCity(event.target.value)}
+                  className="w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-semibold text-white outline-none transition focus:border-white/30"
                 >
                   <option value="">All cities</option>
-                  {cities.map((c) => (
-                    <option key={c} value={c} className="text-slate-900">{c}</option>
+                  {[...new Set([...quickCities, ...cities])].map((city) => (
+                    <option key={city} value={city} className="text-slate-900">
+                      {city}
+                    </option>
                   ))}
                 </select>
 
                 <button
                   type="button"
-                  onClick={() => {
-                    const qs = new URLSearchParams();
-                    if (heroQ.trim()) qs.set("q", heroQ.trim());
-                    if (heroCity.trim()) qs.set("city", heroCity.trim());
-                    navigate(`/rooms${qs.toString() ? `?${qs.toString()}` : ""}`);
-                  }}
-                  className="inline-flex items-center justify-center rounded-2xl bg-white px-6 py-3 text-sm font-black text-slate-950 transition hover:bg-slate-100"
+                  onClick={() => openSearch()}
+                  className="inline-flex items-center justify-center rounded-2xl bg-[#f7e4c4] px-6 py-3 text-sm font-black text-[#1f170f] transition hover:brightness-105"
                 >
-                  Search
+                  Explore
                 </button>
               </div>
 
-              <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-                <button type="button" onClick={() => navigate("/rooms")} className="inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-sm font-bold text-white backdrop-blur-md transition hover:bg-white/15">Browse Rooms</button>
-                <button type="button" onClick={() => navigate("/register")} className="inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-sm font-bold text-white backdrop-blur-md transition hover:bg-white/15">Create Account</button>
-              </div>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              {recentSearches.map((item) => (
-                <button key={item} type="button" onClick={() => navigate(`/rooms?city=${encodeURIComponent(item.split(" ")[0])}`)} className="rounded-full border border-white/20 bg-white/10 px-3 py-2 text-xs font-medium text-white/90 backdrop-blur-md transition hover:bg-white/20">
-                  {item}
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-10 grid max-w-3xl gap-4 sm:grid-cols-3">
-              <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur-md"><p className="text-3xl font-black text-white">20K+</p><p className="mt-2 text-sm text-slate-200">Monthly room seekers</p></div>
-              <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur-md"><p className="text-3xl font-black text-white">4.9/5</p><p className="mt-2 text-sm text-slate-200">Average renter rating</p></div>
-              <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur-md"><p className="text-3xl font-black text-white">Simple</p><p className="mt-2 text-sm text-slate-200">Cleaner first-time experience</p></div>
-            </div>
-
-            <div className="mt-8 flex items-center justify-between gap-4 text-white/90">
-              <div className="flex items-center gap-3">
-                <button type="button" onClick={() => setActiveSlide((activeSlide + heroSlides.length - 1) % heroSlides.length)} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 backdrop-blur-md transition hover:bg-white/20"><ChevronLeft className="h-5 w-5" /></button>
-                <button type="button" onClick={() => setActiveSlide((activeSlide + 1) % heroSlides.length)} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 backdrop-blur-md transition hover:bg-white/20"><ChevronRight className="h-5 w-5" /></button>
-              </div>
-              <div className="hidden items-center gap-2 sm:flex">{heroSlides.map((slide, index) => <button key={slide.image} type="button" onClick={() => setActiveSlide(index)} className={`h-2.5 rounded-full transition ${index === activeSlide ? "w-10 bg-white" : "w-2.5 bg-white/40"}`} aria-label={`Show slide ${index + 1}`} />)}</div>
-            </div>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.08 }} className="grid gap-4 self-end lg:pt-16">
-            <div className="rounded-[2rem] border border-white/15 bg-white/10 p-5 text-white backdrop-blur-xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/70">Quick actions</p>
-              <div className="mt-4 grid gap-3">
-                {quickActions.map((item) => (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {quickCities.map((city) => (
                   <button
-                    key={item.title}
+                    key={city}
                     type="button"
-                    onClick={() => navigate(item.path)}
-                    className="rounded-[1.5rem] border border-white/10 bg-white/8 p-4 text-left transition hover:bg-white/14"
+                    onClick={() => openSearch(city, "")}
+                    className="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-medium text-white/90 backdrop-blur-md transition hover:bg-white/20"
                   >
-                    <p className="text-base font-bold text-white">{item.title}</p>
-                    <p className="mt-1 text-sm leading-6 text-slate-200">{item.description}</p>
-                    <div className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-sky-100">
-                      {item.action}
-                      <ArrowRight className="h-4 w-4" />
-                    </div>
+                    {city}
                   </button>
                 ))}
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-white/15 bg-white/10 p-5 text-white backdrop-blur-xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/70">How it works</p>
-              <div className="mt-4 grid gap-3">
-                {easySteps.map((item) => {
+            <div className="mt-8 flex items-center gap-3">
+              <button type="button" onClick={() => setActiveSlide((activeSlide + heroSlides.length - 1) % heroSlides.length)} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition hover:bg-white/20">
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button type="button" onClick={() => setActiveSlide((activeSlide + 1) % heroSlides.length)} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition hover:bg-white/20">
+                <ChevronRight className="h-5 w-5" />
+              </button>
+              <div className="hidden items-center gap-2 sm:flex">
+                {heroSlides.map((slide, index) => (
+                  <button
+                    key={slide.image}
+                    type="button"
+                    onClick={() => setActiveSlide(index)}
+                    className={`h-2.5 rounded-full transition ${index === activeSlide ? "w-10 bg-white" : "w-2.5 bg-white/40"}`}
+                    aria-label={`Show slide ${index + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.08 }} className="grid gap-4 lg:pb-4">
+            <div className="rounded-[2rem] border border-white/15 bg-white/10 p-6 text-white backdrop-blur-xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/70">Why this feels easier</p>
+              <div className="mt-5 grid gap-4">
+                {trustPoints.map((item) => {
                   const Icon = item.icon;
                   return (
-                    <div key={item.title} className="flex items-start gap-3 rounded-[1.5rem] bg-white/8 p-4">
-                      <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-2xl bg-white/12 text-white">
+                    <div key={item.title} className="flex items-start gap-3 rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-amber-200">
                         <Icon className="h-5 w-5" />
                       </div>
                       <div>
@@ -437,152 +361,230 @@ export default function Home() {
                 })}
               </div>
             </div>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-[1.75rem] border border-white/15 bg-white/10 p-5 text-white backdrop-blur-md">
+                <p className="text-3xl font-black">20K+</p>
+                <p className="mt-2 text-sm text-slate-200">Monthly room seekers</p>
+              </div>
+              <div className="rounded-[1.75rem] border border-white/15 bg-white/10 p-5 text-white backdrop-blur-md">
+                <p className="text-3xl font-black">4.9/5</p>
+                <p className="mt-2 text-sm text-slate-200">Average renter rating</p>
+              </div>
+              <div className="rounded-[1.75rem] border border-white/15 bg-white/10 p-5 text-white backdrop-blur-md">
+                <p className="text-3xl font-black">3 steps</p>
+                <p className="mt-2 text-sm text-slate-200">Search, shortlist, connect</p>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {featuredRooms !== null && featuredRooms.length > 0 && (
-      <section className="px-4 py-20 sm:px-6 lg:px-8">
+      <section className="px-4 py-20 sm:px-6 md:px-8">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><SectionHeading eyebrow="Featured rooms" title="Premium spaces curated for your lifestyle" subtitle="Browse elegant, verified listings with rich visuals and quick decision-making details." /><button type="button" onClick={() => navigate("/rooms")} className="inline-flex items-center gap-2 rounded-full border border-sky-100 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-sky-200 hover:text-sky-700">View all rooms<ArrowRight className="h-4 w-4" /></button></div>
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">{featuredRooms.map((room, index) => <motion.div key={room.id} initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.45, delay: index * 0.08 }}><FeaturedRoomCard room={room} onQuickView={setSelectedRoom} /></motion.div>)}</div>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <SectionHeading
+              eyebrow="Featured stays"
+              title="Premium spaces without the homepage clutter"
+              subtitle="A smaller, sharper selection keeps the first experience focused and easier to trust."
+            />
+            <button
+              type="button"
+              onClick={() => openSearch()}
+              className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-white px-5 py-3 text-sm font-semibold text-[#5f4b3b] shadow-sm transition hover:border-amber-300 hover:text-amber-700"
+            >
+              View all listings
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="mt-10 grid gap-6 lg:grid-cols-3">
+            {visibleRooms.map((room, index) => (
+              <motion.div
+                key={room.id}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.45, delay: index * 0.08 }}
+              >
+                <FeaturedRoomCard room={room} onSelect={setSelectedRoom} />
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
-      )}
 
-      <section className="px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl overflow-hidden rounded-[36px] border border-amber-100/80 bg-[linear-gradient(180deg,#fffaf3_0%,#f5eadb_100%)] p-5 shadow-[0_36px_100px_-56px_rgba(36,25,15,0.32)] sm:p-8">
-          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><SectionHeading eyebrow="Room image gallery" title="Explore Beautiful Spaces" subtitle="A premium collage of bedrooms, PGs, shared spaces, and studio apartments designed to inspire trust at first glance." /><div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-white/90 px-4 py-2 text-sm font-semibold text-amber-700 shadow-sm"><Sparkles className="h-4 w-4" />Visual-first discovery</div></div>
-          <div className="grid auto-rows-[220px] gap-4 md:grid-cols-4">{galleryImages.map((item, index) => <motion.div key={item.title} initial={{ opacity: 0, scale: 0.98 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.45, delay: index * 0.06 }} className={`group relative overflow-hidden rounded-[28px] ${item.className}`}><img src={item.image} alt={item.title} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-110" referrerPolicy="no-referrer" /><div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent" /><div className="absolute bottom-5 left-5 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-md">{item.title}</div></motion.div>)}</div>
-        </div>
-      </section>
-      <section className="px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <SectionHeading
-            eyebrow="Categories"
-            title="Choose the room style that fits your routine"
-            subtitle="Premium category cards with real spaces, so users can browse by lifestyle instead of plain labels."
-          />
-          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {categories.map((category, index) => {
-              const Icon = category.icon;
-
+      <section className="px-4 py-4 sm:px-6 md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-6 rounded-[36px] border border-amber-100/80 bg-[linear-gradient(180deg,#fffdf9_0%,#f7efe4_100%)] p-6 shadow-[0_30px_80px_-56px_rgba(36,25,15,0.28)] lg:grid-cols-[0.9fr_1.1fr] lg:p-10">
+          <div>
+            <SectionHeading
+              eyebrow="What changed"
+              title="A calmer homepage with a more premium flow"
+              subtitle="We removed the noisy discovery pattern and kept the core journey focused on finding a room quickly."
+            />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {trustPoints.map((item, index) => {
+              const Icon = item.icon;
               return (
-                <motion.button
-                  key={category.title}
-                  type="button"
-                  onClick={() => navigate(`/rooms?type=${encodeURIComponent(category.title)}`)}
+                <motion.div
+                  key={item.title}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.2 }}
-                  transition={{ duration: 0.45, delay: index * 0.08 }}
-                  whileHover={{ y: -8 }}
-                  className="group relative overflow-hidden rounded-[30px] text-left shadow-[0_26px_70px_-42px_rgba(15,23,42,0.35)]"
+                  transition={{ duration: 0.4, delay: index * 0.08 }}
+                  className="rounded-[26px] bg-white p-5 shadow-[0_20px_60px_-52px_rgba(36,25,15,0.3)]"
                 >
-                  <img
-                    src={category.image}
-                    alt={category.title}
-                    loading="lazy"
-                    className="h-[320px] w-full object-cover transition duration-700 group-hover:scale-110"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.3)_40%,rgba(15,23,42,0.82)_100%)]" />
-                  <div className="absolute inset-x-0 top-0 flex items-start justify-between p-5">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-white/15 text-white backdrop-blur-md">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div className="rounded-full border border-white/20 bg-white/15 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md">
-                      {category.count}
-                    </div>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#1f170f] text-amber-200">
+                    <Icon className="h-5 w-5" />
                   </div>
-                  <div className="absolute inset-x-0 bottom-0 p-5">
-                    <div className="rounded-[24px] border border-white/15 bg-white/10 p-5 backdrop-blur-md">
-                      <h3 className="text-xl font-bold text-white">{category.title}</h3>
-                      <p className="mt-2 text-sm leading-7 text-slate-100">{category.description}</p>
-                      <div className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white">
-                        Explore category
-                        <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-                      </div>
-                    </div>
-                  </div>
-                </motion.button>
+                  <h3 className="mt-4 text-lg font-bold text-[#1f170f]">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-7 text-[#5f4b3b]">{item.description}</p>
+                </motion.div>
               );
             })}
           </div>
         </div>
       </section>
 
-      <section className="px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl rounded-[36px] border border-amber-100/80 bg-[linear-gradient(180deg,#fffdf9_0%,#f7efe4_100%)] p-6 shadow-[0_36px_100px_-56px_rgba(36,25,15,0.24)] sm:p-10"><SectionHeading eyebrow="Why choose us" title="Everything you need to rent with confidence" subtitle="We combine high-trust listing quality with a premium browsing experience that works beautifully on every screen." /><div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">{reasons.map((reason, index) => { const Icon = reason.icon; return <motion.div key={reason.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.45, delay: index * 0.08 }} className="rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#fbf4ea_100%)] p-6 shadow-[0_22px_60px_-48px_rgba(36,25,15,0.25)]"><div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-[#1f170f] text-amber-200 shadow-md shadow-amber-900/10"><Icon className="h-6 w-6" /></div><h3 className="mt-5 text-lg font-bold text-[#1e140d]">{reason.title}</h3><p className="mt-3 text-sm leading-7 text-[#5f4b3b]">{reason.description}</p></motion.div>; })}</div></div>
-      </section>
-
-      <section className="px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <SectionHeading
-            eyebrow="Testimonials"
-            title="What renters say about the experience"
-            subtitle="A premium testimonial section with real-feeling renter feedback, Indian names, and a cleaner trust-first layout."
-          />
-          <div className="mt-10 grid gap-6 lg:grid-cols-[0.62fr_0.38fr]">
-            <div className="rounded-[32px] border border-amber-100/80 bg-[linear-gradient(135deg,#fff8ef_0%,#fffdf9_34%,#f3e5cf_100%)] p-6 shadow-[0_30px_80px_-50px_rgba(36,25,15,0.28)] sm:p-8">
-              <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">Featured story</p>
-                  <h3 className="mt-3 text-3xl font-black tracking-tight text-[#1e140d]">{premiumTestimonials[0].name}</h3>
-                  <p className="mt-2 text-sm font-medium text-[#7a6553]">{premiumTestimonials[0].city}</p>
-                </div>
-                <div className="inline-flex items-center gap-2 rounded-full bg-[#1f170f] px-4 py-2 text-sm font-semibold text-amber-100">
-                  <Star className="h-4 w-4 fill-current" />
-                  {premiumTestimonials[0].rating} rating
-                </div>
-              </div>
-              <p className="mt-8 text-lg leading-9 text-[#4e3929]">"{premiumTestimonials[0].detail}"</p>
-              <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                <div className="rounded-2xl bg-white/80 p-4 shadow-sm">
-                  <p className="text-xs uppercase tracking-[0.22em] text-[#9b846f]">Role</p>
-                  <p className="mt-2 text-xl font-bold text-[#1e140d]">{premiumTestimonials[0].tag}</p>
-                </div>
-                <div className="rounded-2xl bg-white/80 p-4 shadow-sm">
-                  <p className="text-xs uppercase tracking-[0.22em] text-[#9b846f]">Trust score</p>
-                  <p className="mt-2 text-xl font-bold text-[#1e140d]">Verified</p>
-                </div>
-                <div className="rounded-2xl bg-white/80 p-4 shadow-sm">
-                  <p className="text-xs uppercase tracking-[0.22em] text-[#9b846f]">Experience</p>
-                  <p className="mt-2 text-xl font-bold text-[#1e140d]">Smooth</p>
-                </div>
-              </div>
+      <section className="px-4 py-20 sm:px-6 md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.72fr_0.28fr]">
+          <div className="rounded-[36px] bg-[linear-gradient(135deg,#16120d_0%,#2b1c12_38%,#7c5a2c_100%)] p-8 text-white shadow-[0_40px_100px_-50px_rgba(52,34,16,0.85)] sm:p-10">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-200">Renter feedback</p>
+            <p className="mt-6 text-2xl font-black leading-tight sm:text-4xl">"{testimonial.quote}"</p>
+            <div className="mt-8">
+              <p className="text-lg font-bold">{testimonial.name}</p>
+              <p className="mt-1 text-sm text-amber-100/80">{testimonial.role}</p>
             </div>
-            <div className="grid gap-4">
-              {premiumTestimonials.map((item) => (
-                <div key={item.name} className="rounded-[28px] border border-amber-100/80 bg-[linear-gradient(180deg,#fffdf9_0%,#f7efe4_100%)] p-5 text-left shadow-sm transition hover:border-amber-200">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-base font-bold text-[#1e140d]">{item.name}</p>
-                      <p className="mt-1 text-sm text-[#7a6553]">{item.city}</p>
-                    </div>
-                    <div className="rounded-full bg-amber-50 px-3 py-1.5 text-sm font-semibold text-amber-700">
-                      {item.rating}
-                    </div>
-                  </div>
-                  <p className="mt-3 text-sm font-semibold uppercase tracking-[0.2em] text-amber-700">{item.tag}</p>
-                  <p className="mt-2 text-sm leading-7 text-[#5f4b3b]">{item.detail}</p>
-                </div>
-              ))}
+          </div>
+
+          <div className="flex flex-col justify-between rounded-[36px] border border-amber-100/80 bg-white p-8 shadow-[0_30px_80px_-56px_rgba(36,25,15,0.2)]">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-700">Ready to search</p>
+              <h3 className="mt-3 text-3xl font-black tracking-tight text-[#1f170f]">Start with less friction.</h3>
+              <p className="mt-4 text-sm leading-7 text-[#5f4b3b]">Open the listing page with a simple city search and refine only if you need to.</p>
+            </div>
+
+            <div className="mt-8 grid gap-3">
+              <button
+                type="button"
+                onClick={() => openSearch()}
+                className="inline-flex items-center justify-center rounded-2xl bg-[#1f170f] px-5 py-3 text-sm font-bold text-amber-50 transition hover:bg-[#342518]"
+              >
+                Browse listings
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate("/map")}
+                className="inline-flex items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3 text-sm font-bold text-amber-800 transition hover:border-amber-300"
+              >
+                Open map view
+              </button>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl overflow-hidden rounded-[36px] bg-[linear-gradient(135deg,#16120d_0%,#2b1c12_34%,#7c5a2c_100%)] px-6 py-10 text-white shadow-[0_40px_100px_-50px_rgba(52,34,16,0.85)] sm:px-10 sm:py-14"><div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center"><div><p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-200">Call to action</p><h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Start Your Room Search Now</h2><p className="mt-4 max-w-2xl text-sm leading-7 text-amber-50/85 sm:text-base">Discover premium room listings, shortlist faster, and move into a verified space that matches your lifestyle and budget.</p></div><div className="flex flex-col gap-3 sm:flex-row"><button type="button" onClick={() => navigate("/rooms")} className="inline-flex items-center justify-center rounded-2xl bg-[#f6e7cf] px-5 py-3 text-sm font-bold text-[#1e140d] transition hover:brightness-105">Browse Rooms</button><button type="button" onClick={() => navigate("/register")} className="inline-flex items-center justify-center rounded-2xl border border-amber-200/30 bg-white/10 px-5 py-3 text-sm font-bold text-white backdrop-blur-md transition hover:bg-white/20">List Your Property</button></div></div></div>
-      </section>
+      <footer className="px-4 pb-16 pt-4 sm:px-6 md:px-8">
+        <div className="mx-auto max-w-7xl rounded-[36px] border border-amber-100/80 bg-[linear-gradient(180deg,#fffdf9_0%,#f5ece0_100%)] px-6 py-8 shadow-[0_26px_70px_-50px_rgba(36,25,15,0.3)] sm:px-10 sm:py-10">
+          <div className="grid gap-8 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
+            <div>
+              <BrandLogo subtitle="" />
+              <p className="mt-5 max-w-sm text-sm leading-7 text-[#5f4b3b]">
+                Helping bachelors, students, and professionals discover verified spaces with a simpler and more polished search flow.
+              </p>
+            </div>
 
-      <footer className="px-4 pb-16 pt-10 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl rounded-[36px] border border-amber-100/80 bg-[linear-gradient(180deg,#fffdf9_0%,#f5ece0_100%)] px-6 py-8 shadow-[0_26px_70px_-50px_rgba(36,25,15,0.3)] sm:px-10 sm:py-10"><div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr_0.85fr_1fr]"><div><BrandLogo subtitle="Premium room discovery platform" /><p className="mt-5 max-w-sm text-sm leading-7 text-[#5f4b3b]">Helping bachelors, students, and professionals discover verified spaces with premium visuals and smoother direct-contact experiences.</p></div><div><p className="text-sm font-bold text-[#1e140d]">Quick Links</p><div className="mt-4 grid gap-3 text-sm text-[#5f4b3b]"><button type="button" onClick={() => navigate("/")} className="text-left hover:text-amber-700">Home</button><button type="button" onClick={() => navigate("/rooms")} className="text-left hover:text-amber-700">Browse Rooms</button><button type="button" onClick={() => navigate("/services")} className="text-left hover:text-amber-700">Services</button><button type="button" onClick={() => navigate("/support")} className="text-left hover:text-amber-700">Support</button></div></div><div><p className="text-sm font-bold text-[#1e140d]">Contact</p><div className="mt-4 space-y-3 text-sm text-[#5f4b3b]"><p>hello@bachelorrooms.com</p><p>+91 90000 12345</p><p>Mumbai, Pune, Nashik, Goa</p></div></div><div><p className="text-sm font-bold text-[#1e140d]">Get the app</p><div className="mt-4 space-y-3"><button type="button" className="flex w-full items-center gap-3 rounded-2xl border border-amber-100 bg-white/80 px-4 py-3 text-left text-sm font-semibold text-[#3c2a1b] transition hover:border-amber-200"><Apple className="h-5 w-5" />Download on App Store</button><button type="button" className="flex w-full items-center gap-3 rounded-2xl border border-amber-100 bg-white/80 px-4 py-3 text-left text-sm font-semibold text-[#3c2a1b] transition hover:border-amber-200"><Play className="h-5 w-5" />Get it on Play Store</button></div><div className="mt-5 flex items-center gap-3 text-[#7a6553]">{[Instagram, Facebook, Twitter].map((Icon, index) => <button key={index} type="button" className="flex h-10 w-10 items-center justify-center rounded-full border border-amber-100 transition hover:border-amber-200 hover:text-amber-700"><Icon className="h-4 w-4" /></button>)}</div></div></div></div>
+            <div>
+              <p className="text-sm font-bold text-[#1f170f]">Explore</p>
+              <div className="mt-4 grid gap-3 text-sm text-[#5f4b3b]">
+                <button type="button" onClick={() => navigate("/")} className="text-left hover:text-amber-700">Home</button>
+                <button type="button" onClick={() => openSearch()} className="text-left hover:text-amber-700">Listings</button>
+                <button type="button" onClick={() => navigate("/map")} className="text-left hover:text-amber-700">Map</button>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm font-bold text-[#1f170f]">Contact</p>
+              <div className="mt-4 space-y-3 text-sm text-[#5f4b3b]">
+                <p>hello@bachelorrooms.com</p>
+                <p>+91 90000 12345</p>
+                <p>Mumbai, Pune, Nashik, Goa</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </footer>
 
       <AnimatePresence>
-        {selectedRoom ? <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/55 px-4 py-6 backdrop-blur-sm" onClick={() => setSelectedRoom(null)}><motion.div initial={{ opacity: 0, y: 24, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 24, scale: 0.96 }} transition={{ duration: 0.22 }} onClick={(e) => e.stopPropagation()} className="w-full max-w-3xl overflow-hidden rounded-[32px] border border-white/80 bg-white shadow-[0_40px_100px_-50px_rgba(15,23,42,0.45)]"><div className="grid gap-0 md:grid-cols-[0.95fr_1.05fr]"><img src={selectedRoom.image} alt={selectedRoom.title} className="h-72 w-full object-cover md:h-full" referrerPolicy="no-referrer" /><div className="p-6 sm:p-8"><div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-600"><CheckCircle2 className="h-4 w-4" />Verified Listing</div><h3 className="mt-4 text-3xl font-black tracking-tight text-slate-950">{selectedRoom.title}</h3><p className="mt-3 text-sm leading-7 text-slate-600">Luxury-ready stay with modern interiors, strong connectivity, and a premium living experience crafted for working professionals and students.</p><div className="mt-6 grid gap-3 sm:grid-cols-2"><div className="rounded-2xl bg-slate-50 p-4"><p className="text-xs uppercase tracking-[0.24em] text-slate-400">Location</p><p className="mt-2 font-semibold text-slate-900">{selectedRoom.location}, {selectedRoom.city}</p></div><div className="rounded-2xl bg-slate-50 p-4"><p className="text-xs uppercase tracking-[0.24em] text-slate-400">Monthly Price</p><p className="mt-2 font-semibold text-slate-900">{selectedRoom.price}</p></div><div className="rounded-2xl bg-slate-50 p-4"><p className="text-xs uppercase tracking-[0.24em] text-slate-400">Category</p><p className="mt-2 font-semibold text-slate-900">{selectedRoom.type}</p></div><div className="rounded-2xl bg-slate-50 p-4"><p className="text-xs uppercase tracking-[0.24em] text-slate-400">Highlights</p><div className="mt-2 flex items-center gap-2 font-semibold text-slate-900"><Wifi className="h-4 w-4 text-sky-700" />Wi-Fi, premium furnishing</div></div></div><div className="mt-8 flex flex-col gap-3 sm:flex-row"><button type="button" onClick={() => navigate(`/rooms/${selectedRoom.id}`)} className="inline-flex items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#2563eb_0%,#38bdf8_100%)] px-5 py-3 text-sm font-bold text-white transition hover:brightness-105">View Full Details</button><button type="button" onClick={() => setSelectedRoom(null)} className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:border-sky-200 hover:text-sky-700">Close</button></div></div></div></motion.div></motion.div> : null}
+        {selectedRoom ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/55 px-4 py-6 backdrop-blur-sm"
+            onClick={() => setSelectedRoom(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 24, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 24, scale: 0.96 }}
+              transition={{ duration: 0.22 }}
+              onClick={(event) => event.stopPropagation()}
+              className="w-full max-w-3xl overflow-hidden rounded-[32px] border border-white/80 bg-white shadow-[0_40px_100px_-50px_rgba(15,23,42,0.45)]"
+            >
+              <div className="grid gap-0 md:grid-cols-[0.95fr_1.05fr]">
+                <img src={selectedRoom.image} alt={selectedRoom.title} className="h-72 w-full object-cover md:h-full" referrerPolicy="no-referrer" />
+                <div className="p-6 sm:p-8">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-600">
+                    <CheckCircle2 className="h-4 w-4" />
+                    Verified Listing
+                  </div>
+                  <h3 className="mt-4 text-3xl font-black tracking-tight text-slate-950">{selectedRoom.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-slate-600">
+                    Premium-ready stay with modern interiors, strong connectivity, and a cleaner shortlist experience for renters.
+                  </p>
+
+                  <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-2xl bg-slate-50 p-4">
+                      <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Location</p>
+                      <p className="mt-2 font-semibold text-slate-900">{selectedRoom.location}, {selectedRoom.city}</p>
+                    </div>
+                    <div className="rounded-2xl bg-slate-50 p-4">
+                      <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Monthly Price</p>
+                      <p className="mt-2 font-semibold text-slate-900">{selectedRoom.price}</p>
+                    </div>
+                    <div className="rounded-2xl bg-slate-50 p-4">
+                      <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Category</p>
+                      <p className="mt-2 font-semibold text-slate-900">{selectedRoom.type}</p>
+                    </div>
+                    <div className="rounded-2xl bg-slate-50 p-4">
+                      <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Status</p>
+                      <p className="mt-2 font-semibold text-slate-900">Verified and ready to review</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/map/${selectedRoom.id}`)}
+                      className="inline-flex items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#1f170f_0%,#7c5a2c_100%)] px-5 py-3 text-sm font-bold text-white transition hover:brightness-105"
+                    >
+                      View Full Details
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedRoom(null)}
+                      className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:border-amber-200 hover:text-amber-700"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        ) : null}
       </AnimatePresence>
     </div>
   );

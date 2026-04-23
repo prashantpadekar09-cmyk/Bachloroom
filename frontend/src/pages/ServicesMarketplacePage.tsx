@@ -143,8 +143,8 @@ export default function ServicesMarketplacePage() {
   const visibleCategories = preferredCategories.filter((category) => categories.includes(category));
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="relative mb-8 overflow-hidden rounded-[2rem] border border-amber-200/25 bg-[linear-gradient(135deg,#16120d_0%,#24190f_22%,#3a2919_54%,#f6ead6_140%)] p-6 text-white shadow-[0_35px_120px_-55px_rgba(36,25,15,0.88)] sm:p-8 lg:p-10">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-8">
+      <div className="relative mb-8 overflow-hidden rounded-[2rem] border border-amber-200/25 bg-[linear-gradient(135deg,#16120d_0%,#24190f_22%,#3a2919_54%,#f6ead6_140%)] p-6 text-white shadow-[0_35px_120px_-55px_rgba(36,25,15,0.88)] sm:p-8 md:p-10">
         <div className="absolute inset-y-0 right-0 w-1/2 bg-[radial-gradient(circle_at_top_right,rgba(255,248,235,0.16),transparent_60%)]" />
         <div className="relative">
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-200/35 bg-white/10 px-4 py-2 text-sm font-semibold text-amber-100 shadow-lg">
@@ -187,7 +187,7 @@ export default function ServicesMarketplacePage() {
         </div>
       </div>
 
-      <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-amber-100/80 bg-[linear-gradient(180deg,#fffdf9_0%,#f7efe4_100%)] p-4 shadow-sm lg:flex-row">
+      <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-amber-100/80 bg-[linear-gradient(180deg,#fffdf9_0%,#f7efe4_100%)] p-4 shadow-sm md:flex-row">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[#8a735d]" />
           <input
@@ -198,7 +198,7 @@ export default function ServicesMarketplacePage() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 hide-scrollbar">
+        <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
           <button
             onClick={() => setCategoryFilter("")}
             className={`px-4 py-2 rounded-xl whitespace-nowrap transition-colors ${

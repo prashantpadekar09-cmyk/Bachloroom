@@ -15,7 +15,6 @@ import {
   Star,
   User,
 } from "lucide-react";
-import { GoogleGenAI } from "@google/genai";
 import { useAuth } from "../context/AuthContext";
 import ReviewSystem from "../components/ReviewSystem";
 import CreditPurchaseModal from "../components/CreditPurchaseModal";
@@ -140,24 +139,17 @@ export default function RoomDetail() {
       }
 
       try {
-        const prompt = `Evaluate the rent price for this room in India:
-City: ${room.city}
-Location: ${room.location}
-Type: ${room.type}
-Price: Rs. ${room.price}/month
-Amenities: ${Array.isArray(room.amenities) ? room.amenities.join(", ") : room.amenities}
+        const res = await fetch(`/api/rooms/${room.id}/price-evaluation`);
+        if (!res.ok) {
+          setPriceEvaluation(null);
+          return;
+        }
 
-Is this price 'Fair', 'Overpriced', or a 'Good Deal'? Respond with ONLY ONE of those three phrases.`;
-
-        const ai = new GoogleGenAI({ apiKey: (import.meta as any).env?.VITE_GEMINI_API_KEY as string });
-        const response = await ai.models.generateContent({
-          model: "gemini-2.0-flash",
-          contents: prompt,
-        });
-
-        setPriceEvaluation(response.text?.trim() || "Fair");
+        const data = await res.json();
+        setPriceEvaluation(typeof data.evaluation === "string" ? data.evaluation : null);
       } catch (err) {
         console.error("Failed to evaluate price", err);
+        setPriceEvaluation(null);
       }
     };
 
@@ -247,7 +239,7 @@ Is this price 'Fair', 'Overpriced', or a 'Good Deal'? Respond with ONLY ONE of t
   return (
     <div className="min-h-screen bg-transparent pb-12">
       <div className="ambient-surface">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 md:px-8">
           <div className="h-[52svh] min-h-[320px] sm:h-[60vh] sm:min-h-[400px]">
             <div className="group relative h-full overflow-hidden rounded-3xl shadow-sm">
               <img
@@ -278,9 +270,9 @@ Is this price 'Fair', 'Overpriced', or a 'Good Deal'? Respond with ONLY ONE of t
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
-          <div className="space-y-10 lg:col-span-2">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 md:px-8">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
+          <div className="space-y-10 md:col-span-2">
             <div className="mb-8 flex flex-wrap items-center gap-3">
               {!isExternalRoom && ratingStats.total > 0 ? (
                 <div className="inline-flex items-center rounded-full border border-yellow-100 bg-yellow-50 px-4 py-1.5 text-sm font-bold text-yellow-700 shadow-sm">
@@ -377,7 +369,7 @@ Is this price 'Fair', 'Overpriced', or a 'Good Deal'? Respond with ONLY ONE of t
                     referrerPolicy="no-referrer"
                   />
                 </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                   {room.images.map((image: string, index: number) => (
                     <button
                       key={`${room.id}-gallery-${index}`}
@@ -618,6 +610,35 @@ Is this price 'Fair', 'Overpriced', or a 'Good Deal'? Respond with ONLY ONE of t
         owner={owner}
         phone={owner?.phone || unlockedPhone || ""}
       />
+
+      {/* Mobile Fixed Action Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-[60] border-t border-slate-200 bg-white/95 px-4 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] pt-3 backdrop-blur-xl md:hidden">
+        <div className="mx-auto flex max-w-lg items-center justify-between gap-4">
+          <div className="flex flex-col">
+            <span className="text-lg font-black text-slate-900">{priceDisplay}</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Deposit: {depositText}</span>
+          </div>
+          {isExternalRoom ? (
+            <a
+              href={room.sourceUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex-1 rounded-2xl bg-blue-600 py-3.5 text-center text-sm font-bold text-white shadow-lg shadow-blue-900/20 active:scale-95 transition"
+            >
+              Open Source
+            </a>
+          ) : (
+            <button
+              onClick={handleUnlockOwnerDetails}
+              className={`flex-1 rounded-2xl py-3.5 text-center text-sm font-bold text-white shadow-lg active:scale-95 transition ${
+                contactUnlocked ? "bg-emerald-600 shadow-emerald-900/20" : "bg-amber-600 shadow-amber-900/20"
+              }`}
+            >
+              {contactUnlocked ? "View Contact" : "Unlock Details"}
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

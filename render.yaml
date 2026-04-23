@@ -7,17 +7,19 @@ services:
     startCommand: npm run start
     disk:
       name: bachloroom-local-data
-      mountPath: /opt/render/project/src/database/data
+      mountPath: /var/data
       sizeGB: 1
     envVars:
       - key: DATA_DIR
-        value: /opt/render/project/src/database/data
+        value: /var/data
+      - key: DB_PATH
+        value: /var/data/database.sqlite
       - key: NODE_ENV
         value: production
       - key: JWT_SECRET
-        value: e06f81b7bef7471da72cabe1cf937471e7aef26737794844bfe0b1cc5f9c1a93d26ce8b9c1ca4777bd6eca9a41fba963
+        sync: false
       - key: GEMINI_API_KEY
-        value: AIzaSyAwRdt-er95XQqp23GaiyHHt-fwJYAfreY
+        sync: false
       - key: RAZORPAY_KEY_ID
         sync: false
       - key: RAZORPAY_KEY_SECRET

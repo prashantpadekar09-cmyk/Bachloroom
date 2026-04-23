@@ -63,8 +63,8 @@ export default function Login() {
   );
 
   return (
-    <div className="px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
-      <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[0.95fr_1.05fr]">
+    <div className="px-4 py-6 sm:px-6 sm:py-10 md:px-8">
+      <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-[0.95fr_1.05fr]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

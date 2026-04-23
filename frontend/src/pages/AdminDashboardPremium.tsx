@@ -203,7 +203,7 @@ export default function AdminDashboardPremium() {
       <section className="relative overflow-hidden rounded-[2rem] border border-amber-200/35 bg-[linear-gradient(135deg,#16120d_0%,#2a1c11_28%,#8a6431_78%,#f6ead6_140%)] p-6 text-white shadow-[0_35px_120px_-50px_rgba(84,56,21,0.7)] sm:p-8">
         <div className="absolute -right-20 top-0 h-56 w-56 rounded-full bg-amber-50/15 blur-3xl" />
         <div className="absolute bottom-0 left-0 h-48 w-48 rounded-full bg-amber-300/25 blur-3xl" />
-        <div className="relative grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+        <div className="relative grid gap-6 md:grid-cols-[1.2fr_0.8fr] md:items-end">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-amber-200/30 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-amber-50/95 backdrop-blur-md">
               <ShieldCheck className="h-4 w-4 text-[#f4deb1]" />
