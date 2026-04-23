@@ -130,13 +130,20 @@ export async function pushLocalToSupabase() {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+    console.log("  🧹 Clearing remote tables...");
     for (const table of [...supabaseTableOrder].reverse()) {
       await client.query(`DELETE FROM ${quoteIdent(table)}`);
     }
+    
     for (const table of supabaseTableOrder) {
       const columns = getColumns(table);
       const rows = db.prepare(`SELECT * FROM ${table}`).all() as Record<string, unknown>[];
-      if (rows.length === 0) continue;
+      if (rows.length === 0) {
+        console.log(`  ⚪ ${table}: 0 rows`);
+        continue;
+      }
+      
+      console.log(`  📤 ${table}: ${rows.length} rows...`);
       const quotedColumns = columns.map(quoteIdent).join(", ");
       const placeholders = columns.map((_, i) => `$${i + 1}`).join(", ");
       const insertSql = `INSERT INTO ${quoteIdent(table)} (${quotedColumns}) VALUES (${placeholders})`;
